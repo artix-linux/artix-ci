@@ -1,6 +1,16 @@
 #!/usr/bin/env groovy
 
-static String getRepo(String src) {
+String PKG_TRUNK = ''
+String PKG_PATH = ''
+String ADD_ARGS = ''
+String RM_ARGS = ''
+String BUILD_ARGS = ''
+Boolean IS_ADD = false
+Boolean IS_REMOVE = false
+Boolean IS_BUILD = false
+Boolean IS_BUILD_SUCCESS = false
+
+String getRepo(String src) {
     String repo = ''
     if ( src == 'staging-x86_64' || src == 'staging-any' ) {
         repo = 'goblins'
@@ -26,7 +36,7 @@ static String getRepo(String src) {
     return repo
 }
 
-static List<String> getRepos(String src, String dest) {
+List<String> getRepos(String src, String dest) {
     List<String> repoList = []
     if ( src == 'staging-x86_64' && dest == 'testing-x86_64' ) {
         repoList.add('gremlins')
@@ -126,4 +136,108 @@ static List<String> getRepos(String src, String dest) {
         repoList.add('lib32')
     }
     return repoList
+}
+
+String getCommit() {
+    return sh(returnStdout: true, script: 'git rev-parse @').trim()
+
+}
+
+List<String> getChangeSet(String commit) {
+    return sh(returnStdout: true, script: "git show --pretty=format: --name-status ${currentCommit}").tokenize('\n')
+}
+
+List<String> getPathState(List<String> changeset) {
+    List<String> pkgList = []
+    for ( int i = 0; i < changeset.size(); i++ ) {
+        List<String> entry = changeset[i].split()
+        String fileStatus = entry[0]
+        for ( int j = 1; j < entry.size(); j++ ) {
+            if ( entry[j].contains('/PKGBUILD') && entry[j].contains('/repos') ){
+                pkgList.add("${fileStatus} " + entry[j].minus('/PKGBUILD'))
+            }
+        }
+    }
+    return pkgList
+}
+
+static void configure() {
+    String currentCommit = getCommit
+    List<String> changeSet = getChangeSet(currentCommit)
+
+    List<String> pkgPathState = getPathState(changeSet)
+
+    echo "currentCommit: ${currentCommit}"
+    echo "pkgPathState: ${pkgPathState}"
+
+    byte pkgCount = pkgPathState.size()
+
+    if ( pkgCount > 0 ) {
+        List<String> pkgPath = []
+        List<String> pkgState = []
+        String srcRepo = ''
+        String destRepo = ''
+        String repoAdd = ''
+        String repoRemove = ''
+        if ( pkgCount == 1 ) {
+            pkgPath.add(pkgPathState[0].split()[1])
+            pkgState.add(pkgPathState[0].split()[0])
+            srcRepo = pkgPath[0].tokenize('/')[2]
+
+            if ( pkgState[0] == 'A' || pkgState[0] == 'M' ) {
+                IS_BUILD = true
+                repoAdd = getRepo(srcRepo)
+                BUILD_ARGS = "-r ${repoAdd}"
+            } else if ( pkgState[0] == 'D' ) {
+                IS_REMOVE = true
+                repoRemove = getRepo(srcRepo)
+            }
+            PKG_PATH = pkgPath[0]
+            PKG_TRUNK = pkgPath[0].tokenize('/')[0] + '/trunk'
+        } else if ( pkgCount == 2 ) {
+            pkgPath.add(pkgPathState[0].split()[1])
+            pkgPath.add(pkgPathState[1].split()[1])
+            pkgState.add(pkgPathState[0].split()[0])
+            pkgState.add(pkgPathState[1].split()[0])
+            srcRepo = pkgPath[0].tokenize('/')[2]
+            destRepo = pkgPath[1].tokenize('/')[2]
+
+            if ( pkgState[0] == 'M' ) {
+                IS_ADD = true
+                repoAdd = getRepo(srcRepo)
+                PKG_PATH = pkgPath[1]
+            } else if ( pkgState[1] == 'M' ) {
+                IS_ADD = true
+                repoAdd = getRepo(destRepo)
+                PKG_PATH = pkgPath[0]
+            }
+
+            if ( pkgState[0] == 'D' ) {
+                IS_REMOVE = true
+                repoRemove = getRepo(srcRepo)
+                PKG_PATH = pkgPath[1]
+            } else if ( pkgState[1] == 'D' ) {
+                IS_REMOVE = true
+                repoRemove = getRepo(destRepo)
+                PKG_PATH = pkgPath[0]
+            }
+
+            if ( pkgState[0].contains('R') && pkgState[1].contains('R') )  {
+                IS_ADD = true
+                IS_REMOVE = true
+                repoAdd = getRepos(srcRepo, destRepo)[0]
+                repoRemove = getRepos(srcRepo, destRepo)[1]
+                PKG_PATH = pkgPath[1]
+            }
+            PKG_TRUNK = pkgPath[0].tokenize('/')[0] + '/trunk'
+        }
+        ADD_ARGS = "-a -d ${repoAdd}"
+        RM_ARGS = "-r -d ${repoRemove}"
+        echo "PKG_PATH: ${PKG_PATH}"
+    }
+}
+
+static void useSign() {
+    IS_BUILD_SUCCESS = true
+    ADD_ARGS += ' -s'
 }
