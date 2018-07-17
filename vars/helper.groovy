@@ -161,7 +161,8 @@ List<String> getPathState(List<String> changeset) {
     return pkgList
 }
 
-static void configure() {
+void configureRepo() {
+
     String currentCommit = getCommit
     List<String> changeSet = getChangeSet(currentCommit)
 
@@ -237,7 +238,7 @@ static void configure() {
     }
 }
 
-static void useSign() {
+void useSign() {
     IS_BUILD_SUCCESS = true
     ADD_ARGS += ' -s'
 }
