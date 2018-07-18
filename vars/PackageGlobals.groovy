@@ -1,12 +1,16 @@
 #!/usr/bin/env groovy
 
-void buildConfig() {
-    String currentCommit = getCommit()
-    echo "currentCommit: ${currentCommit}"
-
-    List<String> changeSet = getChangeSet(currentCommit)
-
-    List<String> pkgPathState = getPathState(changeSet)
+void buildConfig(List<String> changeset) {
+    List<String> pkgPathState = []
+    for ( int i = 0; i < changeset.size(); i++ ) {
+        List<String> entry = changeset[i].split()
+        String fileStatus = entry[0]
+        for ( int j = 1; j < entry.size(); j++ ) {
+            if ( entry[j].contains('/PKGBUILD') && entry[j].contains('/repos') ){
+                pkgPathState.add("${fileStatus} " + entry[j].minus('/PKGBUILD'))
+            }
+        }
+    }
     echo "pkgPathState: ${pkgPathState}"
 
     byte pkgCount = pkgPathState.size()
@@ -203,29 +207,6 @@ List<String> getRepos(String src, String dest) {
         repoList.add('lib32')
     }
     return repoList
-}
-
-String getCommit() {
-    return sh(returnStdout: true, script: 'git rev-parse @').trim()
-
-}
-
-List<String> getChangeSet(String commit) {
-    return sh(returnStdout: true, script: "git show --pretty=format: --name-status ${commit}").tokenize('\n')
-}
-
-List<String> getPathState(List<String> changeset) {
-    List<String> pkgList = []
-    for ( int i = 0; i < changeset.size(); i++ ) {
-        List<String> entry = changeset[i].split()
-        String fileStatus = entry[0]
-        for ( int j = 1; j < entry.size(); j++ ) {
-            if ( entry[j].contains('/PKGBUILD') && entry[j].contains('/repos') ){
-                pkgList.add("${fileStatus} " + entry[j].minus('/PKGBUILD'))
-            }
-        }
-    }
-    return pkgList
 }
 
 String BuildCommand() {
