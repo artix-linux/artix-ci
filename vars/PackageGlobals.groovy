@@ -74,6 +74,7 @@ void buildConfig() {
         PackageGlobals.addArgs.add(repoAdd)
         PackageGlobals.rmArgs.add(repoRemove)
         echo "PackageGlobals.pkgRepo: ${PackageGlobals.pkgRepo}"
+    }
 }
 
 String getRepo(String src) {
