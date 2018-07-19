@@ -1,7 +1,7 @@
 #!/usr/bin/env groovy
 
-package org.artix
-class PackageGlobals implements Serializable {
+package org.artixlinux
+class RepoPackage implements Serializable {
     private final Script script
     private String pkgTrunk = ''
     private String pkgRepo = ''
@@ -13,7 +13,7 @@ class PackageGlobals implements Serializable {
     private Boolean isBuild = false
     private Boolean isBuildSuccess = false
 
-    PackageGlobals(Script script) {
+    RepoPackage(Script script) {
         this.script = script
     }
 
@@ -111,11 +111,11 @@ class PackageGlobals implements Serializable {
 
                 if ( pkgState[0] == 'A' || pkgState[0] == 'M' ) {
                     isBuild = true
-                    repoAdd = helper.getRepo(srcRepo)
+                    repoAdd = script.helper.getRepo(srcRepo)
                     buildArgs.add(repoAdd)
                 } else if ( pkgState[0] == 'D' ) {
                     isRemove = true
-                    repoRemove = helper.getRepo(srcRepo)
+                    repoRemove = script.helper.getRepo(srcRepo)
                 }
                 pkgRepo = pkgPath[0]
                 pkgTrunk = pkgPath[0].tokenize('/')[0] + '/trunk'
@@ -129,28 +129,28 @@ class PackageGlobals implements Serializable {
 
                 if ( pkgState[0] == 'M' ) {
                     isAdd = true
-                    repoAdd = helper.getRepo(srcRepo)
+                    repoAdd = script.helper.getRepo(srcRepo)
                     pkgRepo = pkgPath[1]
                 } else if ( pkgState[1] == 'M' ) {
                     isAdd = true
-                    repoAdd = helper.getRepo(destRepo)
+                    repoAdd = script.helper.getRepo(destRepo)
                     pkgRepo = pkgPath[0]
                 }
 
                 if ( pkgState[0] == 'D' ) {
                     isRemove = true
-                    repoRemove = helper.getRepo(srcRepo)
+                    repoRemove = script.helper.getRepo(srcRepo)
                     pkgRepo = pkgPath[1]
                 } else if ( pkgState[1] == 'D' ) {
                     isRemove = true
-                    repoRemove = helper.getRepo(destRepo)
+                    repoRemove = script.helper.getRepo(destRepo)
                     pkgRepo = pkgPath[0]
                 }
 
                 if ( pkgState[0].contains('R') && pkgState[1].contains('R') )  {
                     isAdd = true
                     isRemove = true
-                    repoAdd = helper.getRepos(srcRepo, destRepo)[0]
+                    repoAdd = script.helper.getRepos(srcRepo, destRepo)[0]
                     repoRemove = getRepos(srcRepo, destRepo)[1]
                     pkgRepo = pkgPath[1]
                 }
