@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-void buildConfig(List<String> changeset) {
+static void buildConfig(List<String> changeset) {
     List<String> pkgPathState = []
     for ( int i = 0; i < changeset.size(); i++ ) {
         List<String> entry = changeset[i].split()
@@ -81,7 +81,7 @@ void buildConfig(List<String> changeset) {
     }
 }
 
-String getRepo(String src) {
+static String getRepo(String src) {
     String repo = ''
     if ( src == 'staging-x86_64' || src == 'staging-any' ) {
         repo = 'goblins'
@@ -107,7 +107,7 @@ String getRepo(String src) {
     return repo
 }
 
-List<String> getRepos(String src, String dest) {
+static List<String> getRepos(String src, String dest) {
     List<String> repoList = []
     if ( src == 'staging-x86_64' && dest == 'testing-x86_64' ) {
         repoList.add('gremlins')
@@ -209,15 +209,15 @@ List<String> getRepos(String src, String dest) {
     return repoList
 }
 
-String BuildCommand() {
+static String BuildCommand() {
     return PackageGlobals.buildArgs.join(' ')
 }
 
-String AddCommand() {
+static String AddCommand() {
     return PackageGlobals.addArgs.join(' ')
 }
 
-String RemoveCommand() {
+static String RemoveCommand() {
     return PackageGlobals.rmArgs.join(' ')
 }
 
