@@ -1,8 +1,8 @@
-@Library(['helper', 'BuildPkg', 'DeployPkg', 'RepoPackage']) import org.artixlinux.RepoPackage
+// @Library(['helper', 'BuildPkg', 'DeployPkg', 'RepoPackage']) import org.artixlinux.RepoPackage
+//
+// def pkg = new RepoPackage(this)
 
-def pkg = new RepoPackage(this)
-
-def call() {
+def call(def pkg) {
     pipeline {
         agent any
         options {
@@ -32,8 +32,7 @@ def call() {
                 post {
                     success {
                         script {
-                            pkg.isBuildSuccess = true
-                            pkg.addArgs.add('-s')
+                            pkg.postBuild()
                         }
                     }
                 }
