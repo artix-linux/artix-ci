@@ -85,7 +85,7 @@ class RepoPackage implements Serializable {
         addArgs.add('-s')
     }
 
-    void configurePkgRepo(List<String> changeset) {
+    void configureRepo(List<String> changeset) {
         List<String> pkgPathState = []
 
         for ( int i = 0; i < changeset.size(); i++ ) {

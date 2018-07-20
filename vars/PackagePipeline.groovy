@@ -12,8 +12,9 @@ def call(def pkg) {
                 steps {
                     script {
                         checkout scm
-                        List<String> changeSet = helper.getChangeSet()
-                        pkg.configurePkgRepo(changeSet)
+                        String commit = sh(returnStdout: true, script: 'git rev-parse @').trim()
+                        List<String> changeSet = sh(returnStdout: true, script: "git show --pretty=format: --name-status ${commit}").tokenize('\n')
+                        pkg.configureRepo(changeSet)
                     }
                 }
             }
