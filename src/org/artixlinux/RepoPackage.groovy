@@ -80,6 +80,11 @@ class RepoPackage implements Serializable {
         isBuildSuccess = value
     }
 
+    void postBuild() {
+        isBuildSuccess = true
+        addArgs.add('-s')
+    }
+
     void configurePkgRepo(List<String> changeset) {
         List<String> pkgPathState = []
 
