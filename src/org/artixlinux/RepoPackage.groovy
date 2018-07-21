@@ -85,89 +85,7 @@ class RepoPackage implements Serializable {
         addArgs.add('-s')
     }
 
-    void configureRepo(List<String> changeset) {
-        List<String> pkgPathState = []
-
-        for ( int i = 0; i < changeset.size(); i++ ) {
-            List<String> entry = changeset[i].split()
-            String fileStatus = entry[0]
-            for ( int j = 1; j < entry.size(); j++ ) {
-                if ( entry[j].contains('/PKGBUILD') && entry[j].contains('/repos') ){
-                    pkgPathState.add("${fileStatus} " + entry[j].minus('/PKGBUILD'))
-                }
-            }
-        }
-        script.echo "pkgPathState: ${pkgPathState}"
-
-        byte pkgCount = pkgPathState.size()
-        script.echo "pkgCount: ${pkgCount}"
-
-        if ( pkgCount > 0 ) {
-            List<String> pkgPath = []
-            List<String> pkgState = []
-            String srcRepo = ''
-            String destRepo = ''
-            String repoAdd = ''
-            String repoRemove = ''
-            if ( pkgCount == 1 ) {
-                pkgPath.add(pkgPathState[0].split()[1])
-                pkgState.add(pkgPathState[0].split()[0])
-                srcRepo = pkgPath[0].tokenize('/')[2]
-
-                if ( pkgState[0] == 'A' || pkgState[0] == 'M' ) {
-                    isBuild = true
-                    repoAdd = getRepo(srcRepo)
-                    buildArgs.add(repoAdd)
-                } else if ( pkgState[0] == 'D' ) {
-                    isRemove = true
-                    repoRemove = getRepo(srcRepo)
-                }
-                pkgRepo = pkgPath[0]
-                pkgTrunk = pkgPath[0].tokenize('/')[0] + '/trunk'
-            } else if ( pkgCount == 2 ) {
-                pkgPath.add(pkgPathState[0].split()[1])
-                pkgPath.add(pkgPathState[1].split()[1])
-                pkgState.add(pkgPathState[0].split()[0])
-                pkgState.add(pkgPathState[1].split()[0])
-                srcRepo = pkgPath[0].tokenize('/')[2]
-                destRepo = pkgPath[1].tokenize('/')[2]
-
-                if ( pkgState[0] == 'M' ) {
-                    isAdd = true
-                    repoAdd = getRepo(srcRepo)
-                    pkgRepo = pkgPath[1]
-                } else if ( pkgState[1] == 'M' ) {
-                    isAdd = true
-                    repoAdd = getRepo(destRepo)
-                    pkgRepo = pkgPath[0]
-                }
-
-                if ( pkgState[0] == 'D' ) {
-                    isRemove = true
-                    repoRemove = getRepo(srcRepo)
-                    pkgRepo = pkgPath[1]
-                } else if ( pkgState[1] == 'D' ) {
-                    isRemove = true
-                    repoRemove = getRepo(destRepo)
-                    pkgRepo = pkgPath[0]
-                }
-
-                if ( pkgState[0].contains('R') && pkgState[1].contains('R') )  {
-                    isAdd = true
-                    isRemove = true
-                    repoAdd = getRepos(srcRepo, destRepo)[0]
-                    repoRemove = getRepos(srcRepo, destRepo)[1]
-                    pkgRepo = pkgPath[1]
-                }
-                pkgTrunk = pkgPath[0].tokenize('/')[0] + '/trunk'
-            }
-            addArgs.add(repoAdd)
-            rmArgs.add(repoRemove)
-            script.echo "pkgRepo: ${pkgRepo}"
-        }
-    }
-
-    String getRepo(String src) {
+    private String getRepo(String src) {
         String repo = ''
         if ( src == 'staging-x86_64' || src == 'staging-any' ) {
             repo = 'goblins'
@@ -193,7 +111,7 @@ class RepoPackage implements Serializable {
         return repo
     }
 
-    List<String> getRepos(String src, String dest) {
+    private List<String> getRepos(String src, String dest) {
         List<String> repoList = []
         if ( src == 'staging-x86_64' && dest == 'testing-x86_64' ) {
             repoList.add('gremlins')
@@ -293,5 +211,102 @@ class RepoPackage implements Serializable {
             repoList.add('lib32')
         }
         return repoList
+    }
+
+    void configureRepo(List<String> changeset) {
+        List<String> pkgPathState = []
+
+        for ( int i = 0; i < changeset.size(); i++ ) {
+            List<String> entry = changeset[i].split()
+            String fileStatus = entry[0]
+            for ( int j = 1; j < entry.size(); j++ ) {
+                if ( entry[j].contains('/PKGBUILD') && entry[j].contains('/repos') ){
+                    pkgPathState.add("${fileStatus} " + entry[j].minus('/PKGBUILD'))
+                }
+            }
+        }
+        script.echo "pkgPathState: ${pkgPathState}"
+
+        byte pkgCount = pkgPathState.size()
+        script.echo "pkgCount: ${pkgCount}"
+
+        if ( pkgCount > 0 ) {
+            List<String> pkgPath = []
+            List<String> pkgState = []
+            String srcRepo = ''
+            String destRepo = ''
+            String repoAdd = ''
+            String repoRemove = ''
+            String srcPath = ''
+            String destPath = ''
+            String srcState = ''
+            String destState = ''
+
+            if ( pkgCount == 1 ) {
+                srcPath = pkgPathState[0].split()[1]
+                pkgPath.add(srcPath)
+                srcState = pkgPathState[0].split()[0]
+                pkgState.add(srcState)
+                srcRepo = pkgPath[0].tokenize('/')[2]
+
+                if ( pkgState[0] == 'A' || pkgState[0] == 'M' ) {
+                    isBuild = true
+                    repoAdd = getRepo(srcRepo)
+                    buildArgs.add(repoAdd)
+                } else if ( pkgState[0] == 'D' ) {
+                    isRemove = true
+                    repoRemove = getRepo(srcRepo)
+                }
+                pkgRepo = pkgPath[0]
+                pkgTrunk = pkgPath[0].tokenize('/')[0] + '/trunk'
+            } else if ( pkgCount == 2 ) {
+                srcPath = pkgPathState[0].split()[1]
+                destPath = pkgPathState[1].split()[1]
+
+                pkgPath.add(srcPath)
+                pkgPath.add(destPath)
+
+                srcState = pkgPathState[0].split()[0]
+                destState = pkgPathState[1].split()[0]
+
+                pkgState.add(srcState)
+                pkgState.add(destState)
+
+                srcRepo = pkgPath[0].tokenize('/')[2]
+                destRepo = pkgPath[1].tokenize('/')[2]
+
+                if ( pkgState[0] == 'M' ) {
+                    isAdd = true
+                    repoAdd = getRepo(srcRepo)
+                    pkgRepo = pkgPath[1]
+                } else if ( pkgState[1] == 'M' ) {
+                    isAdd = true
+                    repoAdd = getRepo(destRepo)
+                    pkgRepo = pkgPath[0]
+                }
+
+                if ( pkgState[0] == 'D' ) {
+                    isRemove = true
+                    repoRemove = getRepo(srcRepo)
+                    pkgRepo = pkgPath[1]
+                } else if ( pkgState[1] == 'D' ) {
+                    isRemove = true
+                    repoRemove = getRepo(destRepo)
+                    pkgRepo = pkgPath[0]
+                }
+
+                if ( pkgState[0].contains('R') && pkgState[1].contains('R') )  {
+                    isAdd = true
+                    isRemove = true
+                    repoAdd = getRepos(srcRepo, destRepo)[0]
+                    repoRemove = getRepos(srcRepo, destRepo)[1]
+                    pkgRepo = pkgPath[1]
+                }
+                pkgTrunk = pkgPath[0].tokenize('/')[0] + '/trunk'
+            }
+            addArgs.add(repoAdd)
+            rmArgs.add(repoRemove)
+            script.echo "pkgRepo: ${pkgRepo}"
+        }
     }
 }
