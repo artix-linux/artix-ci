@@ -27,12 +27,10 @@ def call(def pkg) {
                 }
                 post {
                     success {
-                        script { pkg.postBuild() }
+                        PostBuild(pkg)
                     }
                     failure {
-                        emailext body: "<b>Failure</b><br><br>Project: ${env.JOB_NAME}/${pkg.pkgRepo} <br>Build Number: ${env.BUILD_NUMBER} <br> URL of build: <a href=${env.BUILD_URL}></a>",
-                        subject: "FAILURE CI: ${env.JOB_NAME}/${pkg.pkgRepo}",
-                        to: "devs@artixlinux.org"
+                        Notify(pkg.pkgRepo)
                     }
                 }
             }
