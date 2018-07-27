@@ -220,7 +220,7 @@ class RepoPackage implements Serializable {
             List<String> entry = changeset[i].split()
             String fileStatus = entry[0]
             for ( int j = 1; j < entry.size(); j++ ) {
-                if ( entry[j].contains('/PKGBUILD') && entry[j].contains('/repos') ){
+                if ( entry[j].contains('/PKGBUILD') && entry[j].contains('repos/') ){
                     pkgPathState.add("${fileStatus} " + entry[j].minus('/PKGBUILD'))
                 }
             }
@@ -247,7 +247,14 @@ class RepoPackage implements Serializable {
                 pkgPath.add(srcPath)
                 srcState = pkgPathState[0].split()[0]
                 pkgState.add(srcState)
-                srcRepo = pkgPath[0].tokenize('/')[2]
+
+                if ( pkgPath[0].tokenize('/').size() == 3 ) {
+                    srcRepo = pkgPath[0].tokenize('/')[2]
+                    pkgTrunk = pkgPath[0].tokenize('/')[0] + '/trunk'
+                } else {
+                    srcRepo = pkgPath[0].tokenize('/')[1]
+                    pkgTrunk = 'trunk'
+                }
 
                 if ( pkgState[0] == 'A' || pkgState[0] == 'M' ) {
                     isBuild = true
@@ -258,7 +265,6 @@ class RepoPackage implements Serializable {
                     repoRemove = getRepo(srcRepo)
                 }
                 pkgRepo = pkgPath[0]
-                pkgTrunk = pkgPath[0].tokenize('/')[0] + '/trunk'
             } else if ( pkgCount == 2 ) {
                 srcPath = pkgPathState[0].split()[1]
                 destPath = pkgPathState[1].split()[1]
@@ -272,8 +278,19 @@ class RepoPackage implements Serializable {
                 pkgState.add(srcState)
                 pkgState.add(destState)
 
-                srcRepo = pkgPath[0].tokenize('/')[2]
-                destRepo = pkgPath[1].tokenize('/')[2]
+                if ( pkgPath[0].tokenize('/').size() == 3 ) {
+                    srcRepo = pkgPath[0].tokenize('/')[2]
+                    pkgTrunk = pkgPath[0].tokenize('/')[0] + '/trunk'
+                } else {
+                    srcRepo = pkgPath[0].tokenize('/')[1]
+                    pkgTrunk = 'trunk'
+                }
+
+                if ( pkgPath[1].tokenize('/').size() == 3 ) {
+                    destRepo = pkgPath[1].tokenize('/')[2]
+                } else {
+                    destRepo = pkgPath[1].tokenize('/')[1]
+                }
 
                 if ( pkgState[0] == 'M' ) {
                     isAdd = true
@@ -302,7 +319,6 @@ class RepoPackage implements Serializable {
                     repoRemove = getRepos(srcRepo, destRepo)[1]
                     pkgRepo = pkgPath[1]
                 }
-                pkgTrunk = pkgPath[0].tokenize('/')[0] + '/trunk'
             }
             addArgs.add(repoAdd)
             rmArgs.add(repoRemove)
