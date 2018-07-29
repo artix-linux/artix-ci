@@ -3,11 +3,11 @@
 def call(String trunk, String repo, String cmd){
     if ( fileExists(repo + '/PKGBUILD') ) {
         dir(repo) {
-            echo cmd
+            sh "${cmd}"
         }
     } else {
         dir(trunk) {
-            echo cmd
+            sh "${cmd}"
         }
     }
 }

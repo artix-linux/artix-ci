@@ -2,6 +2,6 @@
 
 def call(String repo, String cmd){
     dir(repo) {
-        echo cmd
+        sh "${cmd}"
     }
 }
