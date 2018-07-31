@@ -209,6 +209,30 @@ class RepoPackage implements Serializable {
         } else if ( src.contains('multilib-x86_64') && dest.contains('multilib-testing') ) {
             repoList.add('lib32-gremlins')
             repoList.add('lib32')
+        } else if ( src.contains('community-testing') && dest == 'testing-x86_64' ) {
+            repoList.add('gremlins')
+            repoList.add('galaxy-gremlins')
+        } else if ( src.contains('community-testing') && dest == 'testing-any' ) {
+            repoList.add('gremlins')
+            repoList.add('galaxy-gremlins')
+        } else if ( src  == 'testing-x86_64' && dest.contains('community-testing') ) {
+            repoList.add('galaxy-gremlins')
+            repoList.add('gremlins')
+        } else if ( src  == 'testing-any' && dest.contains('community-testing') ) {
+            repoList.add('galaxy-gremlins')
+            repoList.add('gremlins')
+        } else if ( src.contains('community-staging') && dest == 'staging-x86_64' ) {
+            repoList.add('goblins')
+            repoList.add('galaxy-goblins')
+        } else if ( src.contains('community-staging') && dest == 'staging-any' ) {
+            repoList.add('goblins')
+            repoList.add('galaxy-goblins')
+        } else if ( src  == 'staging-x86_64' && dest.contains('community-staging') ) {
+            repoList.add('galaxy-goblins')
+            repoList.add('goblins')
+        } else if ( src  == 'staging-any' && dest.contains('community-staging') ) {
+            repoList.add('galaxy-goblins')
+            repoList.add('goblins')
         }
         return repoList
     }
