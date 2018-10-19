@@ -13,6 +13,19 @@ class RepoPackage implements Serializable {
     private Boolean isBuild = false
     private Boolean isBuildSuccess = false
 
+    private Map systemRepo = [artixName: 'system', archName: 'core', arch: 'core-x86_64', any: 'core-any']
+    private Map worldRepo = [artixName: 'world', archName: 'extra', arch: 'extra-x86_64', any: 'extra-any']
+    private Map gremlinsRepo = [artixName: 'gremlins', archName: 'testing', arch: 'testing-x86_64', any: 'testing-any']
+    private Map goblinsRepo = [artixName: 'goblins', archName: 'staging', arch: 'staging-x86_64', any: 'staging-any']
+
+    private Map galaxyRepo = [artixName: 'galaxy', archName: 'community', arch: 'community-x86_64', any: 'community-any']
+    private Map galaxyGremlinsRepo = [artixName: 'galaxy-gremlins', archName: 'community-testing', arch: 'community-testing-x86_64', any: 'community-testing-any']
+    private Map galaxyGoblinsRepo = [artixName: 'galaxy-goblins', archName: 'community-staging', arch: 'community-staging-x86_64', any: 'community-staging-any']
+
+    private Map lib32Repo = [artixName: 'lib32', archName: 'multilib', arch: 'multilib-x86_64']
+    private Map lib32GremlinsRepo = [artixName: 'lib32-gremlins', archName: 'multilib-testing', arch: 'multilib-testing-x86_64']
+    private Map lib32GoblinsRepo = [artixName: 'lib32-goblins', archName: 'multilib-staging', arch: 'multilib-staging-x86_64']
+
     RepoPackage(Script script) {
         this.script = script
     }
@@ -87,152 +100,152 @@ class RepoPackage implements Serializable {
 
     private String getRepo(String src) {
         String repo = ''
-        if ( src == 'staging-x86_64' || src == 'staging-any' ) {
-            repo = 'goblins'
-        } else if ( src == 'testing-x86_64' || src == 'testing-any' ) {
-            repo = 'gremlins'
-        } else if ( src.contains('core') ) {
-            repo = 'system'
-        } else if ( src.contains('extra') ) {
-            repo = 'world'
-        } else if ( src.contains('community-staging') ) {
-            repo = 'galaxy-goblins'
-        } else if ( src.contains('community-testing') ) {
-            repo = 'galaxy-gremlins'
-        } else if ( src == 'community-x86_64' || src == 'community-any' ) {
-            repo = 'galaxy'
-        } else if ( src.contains('multilib-staging') ) {
-            repo = 'lib32-goblins'
-        } else if ( src.contains('multilib-testing') ) {
-            repo = 'lib32-gremlins'
-        } else if ( src.contains('multilib-x86_64') ) {
-            repo = 'lib32'
+        if ( src == goblinsRepo.arch || src == goblinsRepo.any ) {
+            repo = goblinsRepo.artixName
+        } else if ( src == gremlinsRepo.arch || src == gremlinsRepo.any ) {
+            repo = gremlinsRepo.artixName
+        } else if ( src == systemRepo.arch || src == systemRepo.any ) {
+            repo = systemRepo.artixName
+        } else if ( src == worldRepo.arch || src == worldRepo.any ) {
+            repo = worldRepo.artixName
+        } else if ( src == galaxyGoblinsRepo.arch || src == galaxyGoblinsRepo.any ) {
+            repo = galaxyGoblinsRepo.artixName
+        } else if ( src == galaxyGremlinsRepo.arch || src == galaxyGremlinsRepo.any ) {
+            repo = galaxyGremlinsRepo.artixName
+        } else if ( src == galaxyRepo.arch || src == galaxyRepo.any ) {
+            repo = galaxyRepo.artixName
+        } else if ( src == lib32GoblinsRepo.arch ) {
+            repo = lib32GoblinsRepo.artixName
+        } else if ( src == lib32GremlinsRepo.arch ) {
+            repo = lib32GremlinsRepo.artixName
+        } else if ( src == lib32Repo.arch ) {
+            repo = lib32Repo.artixName
         }
         return repo
     }
 
     private List<String> getRepos(String src, String dest) {
         List<String> repoList = []
-        if ( src == 'staging-x86_64' && dest == 'testing-x86_64' ) {
-            repoList.add('gremlins')
-            repoList.add('goblins')
-        } else if ( src == 'staging-any' && dest == 'testing-any' ) {
-            repoList.add('gremlins')
-            repoList.add('goblins')
-        } else if ( src == 'testing-x86_64' && dest == 'staging-x86_64' ) {
-            repoList.add('goblins')
-            repoList.add('gremlins')
-        } else if ( src == 'testing-any' && dest == 'staging-any' ) {
-            repoList.add('goblins')
-            repoList.add('gremlins')
-        } else if ( src.contains('core') && dest == 'testing-x86_64' ) {
-            repoList.add('gremlins')
-            repoList.add('system')
-        } else if ( src.contains('core') && dest == 'testing-any' ) {
-            repoList.add('gremlins')
-            repoList.add('system')
-        } else if ( src == 'testing-x86_64' && dest.contains('core') ) {
-            repoList.add('system')
-            repoList.add('gremlins')
-        } else if ( src == 'testing-any' && dest.contains('core') ) {
-            repoList.add('system')
-            repoList.add('gremlins')
-        } else if ( src.contains('extra') && dest == 'testing-x86_64' ) {
-            repoList.add('gremlins')
-            repoList.add('world')
-        } else if ( src.contains('extra') && dest == 'testing-any' ) {
-            repoList.add('gremlins')
-            repoList.add('world')
-        } else if ( src == 'testing-x86_64' && dest.contains('extra') ) {
-            repoList.add('world')
-            repoList.add('gremlins')
-        } else if ( src == 'testing-any' && dest.contains('extra') ) {
-            repoList.add('world')
-            repoList.add('gremlins')
-        } else if ( src.contains('core') && dest.contains('extra') ) {
-            repoList.add('world')
-            repoList.add('system')
-        } else if ( src.contains('extra') && dest.contains('core') ) {
-            repoList.add('system')
-            repoList.add('world')
-        } else if ( src == 'community-x86_64' && dest.contains('extra') ) {
-            repoList.add('world')
-            repoList.add('galaxy')
-        } else if ( src == 'community-any' && dest.contains('extra') ) {
-            repoList.add('world')
-            repoList.add('galaxy')
-        } else if ( src.contains('extra') && dest == 'community-x86_64' ) {
-            repoList.add('galaxy')
-            repoList.add('world')
-        } else if ( src.contains('extra') && dest == 'community-any' ) {
-            repoList.add('galaxy')
-            repoList.add('world')
-        } else if ( src == 'community-x86_64' && dest.contains('core') ) {
-            repoList.add('system')
-            repoList.add('galaxy')
-        } else if ( src == 'community-any' && dest.contains('core') ) {
-            repoList.add('system')
-            repoList.add('galaxy')
-        } else if ( src.contains('core') && dest == 'community-x86_64' ) {
-            repoList.add('galaxy')
-            repoList.add('system')
-        } else if ( src.contains('core') && dest == 'community-any' ) {
-            repoList.add('galaxy')
-            repoList.add('system')
-        } else if ( src.contains('community-staging') && dest.contains('community-testing') ) {
-            repoList.add('galaxy-gremlins')
-            repoList.add('galaxy-goblins')
-        } else if ( src.contains('community-testing') && dest.contains('community-staging') ) {
-            repoList.add('galaxy-goblins')
-            repoList.add('galaxy-gremlins')
-        } else if ( src.contains('community-testing') && dest == 'community-x86_64' ) {
-            repoList.add('galaxy')
-            repoList.add('galaxy-gremlins')
-        } else if ( src.contains('community-testing') && dest == 'community-any' ) {
-            repoList.add('galaxy')
-            repoList.add('galaxy-gremlins')
-        } else if ( src == 'community-x86_64' && dest.contains('community-testing') ) {
-            repoList.add('galaxy-gremlins')
-            repoList.add('galaxy')
-        } else if ( src == 'community-any' && dest.contains('community-testing') ) {
-            repoList.add('galaxy-gremlins')
-            repoList.add('galaxy')
-        } else if ( src.contains('multilib-staging') && dest.contains('multilib-testing') ) {
-            repoList.add('lib32-gremlins')
-            repoList.add('lib32-goblins')
-        } else if ( src.contains('multilib-testing') && dest.contains('multilib-staging') ) {
-            repoList.add('lib32-goblins')
-            repoList.add('lib32-gremlins')
-        } else if ( src.contains('multilib-testing') && dest.contains('multilib-x86_64') ) {
-            repoList.add('lib32')
-            repoList.add('lib32-gremlins')
-        } else if ( src.contains('multilib-x86_64') && dest.contains('multilib-testing') ) {
-            repoList.add('lib32-gremlins')
-            repoList.add('lib32')
-        } else if ( src.contains('community-testing') && dest == 'testing-x86_64' ) {
-            repoList.add('gremlins')
-            repoList.add('galaxy-gremlins')
-        } else if ( src.contains('community-testing') && dest == 'testing-any' ) {
-            repoList.add('gremlins')
-            repoList.add('galaxy-gremlins')
-        } else if ( src  == 'testing-x86_64' && dest.contains('community-testing') ) {
-            repoList.add('galaxy-gremlins')
-            repoList.add('gremlins')
-        } else if ( src  == 'testing-any' && dest.contains('community-testing') ) {
-            repoList.add('galaxy-gremlins')
-            repoList.add('gremlins')
-        } else if ( src.contains('community-staging') && dest == 'staging-x86_64' ) {
-            repoList.add('goblins')
-            repoList.add('galaxy-goblins')
-        } else if ( src.contains('community-staging') && dest == 'staging-any' ) {
-            repoList.add('goblins')
-            repoList.add('galaxy-goblins')
-        } else if ( src  == 'staging-x86_64' && dest.contains('community-staging') ) {
-            repoList.add('galaxy-goblins')
-            repoList.add('goblins')
-        } else if ( src  == 'staging-any' && dest.contains('community-staging') ) {
-            repoList.add('galaxy-goblins')
-            repoList.add('goblins')
+        if ( src == goblinsRepo.arch && dest == gremlinsRepo.arch ) {
+            repoList.add(gremlinsRepo.artixName)
+            repoList.add(goblinsRepo.artixName)
+        } else if ( src == goblinsRepo.any && dest == gremlinsRepo.any ) {
+            repoList.add(gremlinsRepo.artixName)
+            repoList.add(goblinsRepo.artixName)
+        } else if ( src == gremlinsRepo.arch && dest == goblinsRepo.arch ) {
+            repoList.add(goblinsRepo.artixName)
+            repoList.add(gremlinsRepo.artixName)
+        } else if ( src == gremlinsRepo.any && dest == goblinsRepo.any ) {
+            repoList.add(goblinsRepo.artixName)
+            repoList.add(gremlinsRepo.artixName)
+        } else if ( src.contains(systemRepo.archName) && dest == gremlinsRepo.arch ) {
+            repoList.add(gremlinsRepo.artixName)
+            repoList.add(systemRepo.artixName)
+        } else if ( src.contains(systemRepo.archName) && dest == gremlinsRepo.any ) {
+            repoList.add(gremlinsRepo.artixName)
+            repoList.add(systemRepo.artixName)
+        } else if ( src == gremlinsRepo.arch && dest.contains(systemRepo.archName) ) {
+            repoList.add(systemRepo.artixName)
+            repoList.add(gremlinsRepo.artixName)
+        } else if ( src == gremlinsRepo.any && dest.contains(systemRepo.archName) ) {
+            repoList.add(systemRepo.artixName)
+            repoList.add(gremlinsRepo.artixName)
+        } else if ( src.contains(worldRepo.archName) && dest == gremlinsRepo.arch ) {
+            repoList.add(gremlinsRepo.artixName)
+            repoList.add(worldRepo.artixName)
+        } else if ( src.contains(worldRepo.archName) && dest == gremlinsRepo.any ) {
+            repoList.add(gremlinsRepo.artixName)
+            repoList.add(worldRepo.artixName)
+        } else if ( src == gremlinsRepo.arch && dest.contains(worldRepo.archName) ) {
+            repoList.add(worldRepo.artixName)
+            repoList.add(gremlinsRepo.artixName)
+        } else if ( src == gremlinsRepo.any && dest.contains(worldRepo.archName) ) {
+            repoList.add(worldRepo.artixName)
+            repoList.add(gremlinsRepo.artixName)
+        } else if ( src.contains(systemRepo.archName) && dest.contains(worldRepo.archName) ) {
+            repoList.add(worldRepo.artixName)
+            repoList.add(systemRepo.artixName)
+        } else if ( src.contains(worldRepo.archName) && dest.contains(systemRepo.archName) ) {
+            repoList.add(systemRepo.artixName)
+            repoList.add(worldRepo.artixName)
+        } else if ( src == galaxyRepo.arch && dest.contains(worldRepo.archName) ) {
+            repoList.add(worldRepo.artixName)
+            repoList.add(galaxyRepo.artixName)
+        } else if ( src == galaxyRepo.any && dest.contains(worldRepo.archName) ) {
+            repoList.add(worldRepo.artixName)
+            repoList.add(galaxyRepo.artixName)
+        } else if ( src.contains(worldRepo.archName) && dest == galaxyRepo.arch ) {
+            repoList.add(galaxyRepo.artixName)
+            repoList.add(worldRepo.artixName)
+        } else if ( src.contains(worldRepo.archName) && dest == galaxyRepo.any ) {
+            repoList.add(galaxyRepo.artixName)
+            repoList.add(worldRepo.artixName)
+        } else if ( src == galaxyRepo.arch && dest.contains(systemRepo.archName) ) {
+            repoList.add(systemRepo.artixName)
+            repoList.add(galaxyRepo.artixName)
+        } else if ( src == galaxyRepo.any && dest.contains(systemRepo.archName) ) {
+            repoList.add(systemRepo.artixName)
+            repoList.add(galaxyRepo.artixName)
+        } else if ( src.contains(systemRepo.archName) && dest == galaxyRepo.arch ) {
+            repoList.add(galaxyRepo.artixName)
+            repoList.add(systemRepo.artixName)
+        } else if ( src.contains(systemRepo.archName) && dest == galaxyRepo.any ) {
+            repoList.add(galaxyRepo.artixName)
+            repoList.add(systemRepo.artixName)
+        } else if ( src.contains(galaxyGoblinsRepo.archName) && dest.contains(galaxyGremlinsRepo.archName) ) {
+            repoList.add(galaxyGremlinsRepo.artixName)
+            repoList.add(galaxyGoblinsRepo.artixName)
+        } else if ( src.contains(galaxyGremlinsRepo.archName) && dest.contains(galaxyGoblinsRepo.archName) ) {
+            repoList.add(galaxyGoblinsRepo.artixName)
+            repoList.add(galaxyGremlinsRepo.artixName)
+        } else if ( src.contains(galaxyGremlinsRepo.archName) && dest == galaxyRepo.arch ) {
+            repoList.add(galaxyRepo.artixName)
+            repoList.add(galaxyGremlinsRepo.artixName)
+        } else if ( src.contains(galaxyGremlinsRepo.archName) && dest == galaxyRepo.any ) {
+            repoList.add(galaxyRepo.artixName)
+            repoList.add(galaxyGremlinsRepo.artixName)
+        } else if ( src == galaxyRepo.arch && dest.contains(galaxyGremlinsRepo.archName) ) {
+            repoList.add(galaxyGremlinsRepo.artixName)
+            repoList.add(galaxyRepo.artixName)
+        } else if ( src == galaxyRepo.any && dest.contains(galaxyGremlinsRepo.archName) ) {
+            repoList.add(galaxyGremlinsRepo.artixName)
+            repoList.add(galaxyRepo.artixName)
+        } else if ( src.contains(lib32GoblinsRepo.archName) && dest.contains(lib32GremlinsRepo.archName) ) {
+            repoList.add(lib32GremlinsRepo.artixName)
+            repoList.add(lib32GoblinsRepo.artixName)
+        } else if ( src.contains(lib32GremlinsRepo.archName) && dest.contains(lib32GoblinsRepo.archName) ) {
+            repoList.add(lib32GoblinsRepo.artixName)
+            repoList.add(lib32GremlinsRepo.artixName)
+        } else if ( src.contains(lib32GremlinsRepo.archName) && dest.contains(lib32Repo.arch) ) {
+            repoList.add(lib32Repo.artixName)
+            repoList.add(lib32GremlinsRepo.artixName)
+        } else if ( src.contains(lib32Repo.arch) && dest.contains(lib32GremlinsRepo.archName) ) {
+            repoList.add(lib32GremlinsRepo.artixName)
+            repoList.add(lib32Repo.artixName)
+        } else if ( src.contains(galaxyGremlinsRepo.archName) && dest == gremlinsRepo.arch ) {
+            repoList.add(gremlinsRepo.artixName)
+            repoList.add(galaxyGremlinsRepo.artixName)
+        } else if ( src.contains(galaxyGremlinsRepo.archName) && dest == gremlinsRepo.any ) {
+            repoList.add(gremlinsRepo.artixName)
+            repoList.add(galaxyGremlinsRepo.artixName)
+        } else if ( src  == gremlinsRepo.arch && dest.contains(galaxyGremlinsRepo.archName) ) {
+            repoList.add(galaxyGremlinsRepo.artixName)
+            repoList.add(gremlinsRepo.artixName)
+        } else if ( src  == gremlinsRepo.any && dest.contains(galaxyGremlinsRepo.archName) ) {
+            repoList.add(galaxyGremlinsRepo.artixName)
+            repoList.add(gremlinsRepo.artixName)
+        } else if ( src.contains(galaxyGoblinsRepo.archName) && dest == goblinsRepo.arch ) {
+            repoList.add(goblinsRepo.artixName)
+            repoList.add(galaxyGoblinsRepo.artixName)
+        } else if ( src.contains(galaxyGoblinsRepo.archName) && dest == goblinsRepo.any ) {
+            repoList.add(goblinsRepo.artixName)
+            repoList.add(galaxyGoblinsRepo.artixName)
+        } else if ( src  == goblinsRepo.arch && dest.contains(galaxyGoblinsRepo.archName) ) {
+            repoList.add(galaxyGoblinsRepo.artixName)
+            repoList.add(goblinsRepo.artixName)
+        } else if ( src  == goblinsRepo.any && dest.contains(galaxyGoblinsRepo.archName) ) {
+            repoList.add(galaxyGoblinsRepo.artixName)
+            repoList.add(goblinsRepo.artixName)
         }
         return repoList
     }
