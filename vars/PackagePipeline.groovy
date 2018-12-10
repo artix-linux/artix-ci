@@ -1,29 +1,46 @@
 #!/usr/bin/env groovy
 
+library 'loadChangeSet'
+// library 'CheckNodes'
+library 'BuildPkg'
+library 'Notify'
+library 'PostBuild'
+
 def call(def pkg) {
     pipeline {
+//         agent none
         agent any
         options {
             skipDefaultCheckout()
             timestamps()
         }
+        environment {
+            DRYRUN = false
+        }
         stages {
-            stage('Checkout') {
+            stage('Prepare') {
+//                 agent { label pkg.agentLabel }
                 steps {
                     script {
                         checkout scm
-                        String commit = sh(returnStdout: true, script: 'git rev-parse @~').trim()
-                        List<String> changeSet = sh(returnStdout: true, script: "git show --pretty=format: --name-status ${commit}").tokenize('\n')
-                        pkg.configureRepo(changeSet)
+                        loadChangeSet(pkg)
+//                         CheckNodes(pkg)
+                        echo "repoList: ${pkg.repoList}"
+//                         echo "agentLabel: ${pkg.agentLabel}"
+                        echo "pkgRepo: ${pkg.pkgRepo}"
                     }
                 }
             }
             stage('Build') {
+//                 agent { label pkg.agentLabel }
                 when {
                     expression { return pkg.isBuild }
                 }
                 steps {
-                    BuildPkg(pkg.pkgRepo, pkg.buildArgs.join(' '))
+//                     script {
+//                         checkout scm
+//                     }
+                    BuildPkg(pkg.pkgRepo, pkg.buildArgs.join(' '), DRYRUN.toBoolean())
                 }
                 post {
                     success {
@@ -35,6 +52,7 @@ def call(def pkg) {
                 }
             }
             stage('Add') {
+//                 agent { label 'master' }
                 environment {
                     BUILDBOT_GPGP = credentials('BUILDBOT_GPGP')
                 }
@@ -45,15 +63,16 @@ def call(def pkg) {
                     }
                 }
                 steps {
-                    DeployPkg(pkg.pkgTrunk, pkg.pkgRepo, pkg.addArgs.join(' '))
+                    DeployPkg(pkg.pkgRepo, pkg.addArgs.join(' '), DRYRUN.toBoolean())
                 }
             }
             stage('Remove') {
+//                 agent { label 'master' }
                 when {
                     expression { return pkg.isRemove }
                 }
                 steps {
-                    DeployPkg(pkg.pkgTrunk, pkg.pkgRepo, pkg.rmArgs.join(' '))
+                    DeployPkg(pkg.pkgRepo, pkg.rmArgs.join(' '), DRYRUN.toBoolean())
                 }
             }
         }

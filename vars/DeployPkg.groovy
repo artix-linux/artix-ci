@@ -1,13 +1,21 @@
 #!/usr/bin/env groovy
 
-def call(String trunk, String repo, String cmd){
+def call(String repo, String cmd, Boolean debug){
     if ( fileExists(repo + '/PKGBUILD') ) {
         dir(repo) {
-            sh "${cmd}"
+            if ( debug ) {
+                echo "${cmd}"
+            } else {
+                sh "${cmd}"
+            }
         }
     } else {
-        dir(trunk) {
-            sh "${cmd}"
+        dir('trunk') {
+            if ( debug ) {
+                echo "${cmd}"
+            } else {
+                sh "${cmd}"
+            }
         }
     }
 }

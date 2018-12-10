@@ -2,8 +2,8 @@
 
 def call(String pkg) {
 
-    def subject = "FAILURE CI: ${env.JOB_NAME}/${pkg}"
-    def body = "<b>Failure</b><br><br>Project: ${JOB_NAME}/${pkg} <br>Build Number: ${BUILD_NUMBER} <br> URL of build: <a href=${BUILD_URL}></a>"
+    def subject = "FAILURE CI: ${JOB_NAME}/${pkg}"
+    def body = "Failure: ${JOB_NAME}/${pkg} Build Number: ${BUILD_NUMBER} URL: ${BUILD_URL}"
 
     emailext (
         body: body,
