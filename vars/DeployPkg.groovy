@@ -1,13 +1,6 @@
 #!/usr/bin/env groovy
 
-def call(def pkg, Boolean debug){
-
-    String cmd = ''
-    if ( pkg.isRemove ) {
-        cmd = pkg.rmArgs.join(' ')
-    } else if ( pkg.isAdd ) {
-        cmd = pkg.addArgs.join(' ')
-    }
+def call(def pkg, String cmd, Boolean debug){
 
     if ( pkg.repoList.size() > 0 ) {
         String pkgYaml = sh(returnStdout: true, script: "pkg2yaml ${pkg.pkgRepo}")

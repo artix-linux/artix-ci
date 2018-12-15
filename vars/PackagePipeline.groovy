@@ -48,7 +48,7 @@ def call(def pkg) {
                         PostBuild(pkg)
                     }
                     failure {
-                        Notify(pkg, DRYRUN.toBoolean())
+                        Notify(pkg, false, 'Failure', DRYRUN.toBoolean())
                     }
                 }
             }
@@ -64,11 +64,11 @@ def call(def pkg) {
                     }
                 }
                 steps {
-                    DeployPkg(pkg, DRYRUN.toBoolean())
+                    DeployPkg(pkg, pkg.addArgs.join(' '), DRYRUN.toBoolean())
                 }
                 post {
                     always {
-                        Notify(pkg, DRYRUN.toBoolean())
+                        Notify(pkg, pkg.isAdd, 'repo-add', DRYRUN.toBoolean())
                     }
                 }
             }
@@ -78,11 +78,11 @@ def call(def pkg) {
                     expression { return pkg.isRemove }
                 }
                 steps {
-                    DeployPkg(pkg, DRYRUN.toBoolean())
+                    DeployPkg(pkg, pkg.rmArgs.join(' '), DRYRUN.toBoolean())
                 }
                 post {
                     always {
-                        Notify(pkg, DRYRUN.toBoolean())
+                        Notify(pkg, pkg.isRemove, 'repo-remove', DRYRUN.toBoolean())
                     }
                 }
             }
