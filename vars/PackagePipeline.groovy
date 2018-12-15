@@ -1,10 +1,11 @@
 #!/usr/bin/env groovy
 
-library 'loadChangeSet'
+// library 'loadChangeSet'
 // library 'CheckNodes'
-library 'BuildPkg'
-library 'Notify'
-library 'PostBuild'
+// library 'BuildPkg'
+// library 'Notify'
+// library 'PostBuild'
+// library 'DeployPkg'
 
 def call(def pkg) {
     pipeline {
@@ -22,12 +23,12 @@ def call(def pkg) {
 //                 agent { label pkg.agentLabel }
                 steps {
                     script {
-                        checkout scm
+                        checkout(scm)
                         loadChangeSet(pkg)
-//                         CheckNodes(pkg)
                         echo "repoList: ${pkg.repoList}"
-//                         echo "agentLabel: ${pkg.agentLabel}"
                         echo "pkgRepo: ${pkg.pkgRepo}"
+//                         CheckNodes(pkg)
+//                         echo "agentLabel: ${pkg.agentLabel}"
                     }
                 }
             }
@@ -38,16 +39,16 @@ def call(def pkg) {
                 }
                 steps {
 //                     script {
-//                         checkout scm
+//                         checkout(scm)
 //                     }
-                    BuildPkg(pkg.pkgRepo, pkg.buildArgs.join(' '), DRYRUN.toBoolean())
+                    BuildPkg(pkg, DRYRUN.toBoolean())
                 }
                 post {
                     success {
                         PostBuild(pkg)
                     }
                     failure {
-                        Notify(pkg.pkgRepo)
+                        Notify(pkg, false, 'Failure', DRYRUN.toBoolean())
                     }
                 }
             }
@@ -63,7 +64,12 @@ def call(def pkg) {
                     }
                 }
                 steps {
-                    DeployPkg(pkg.pkgRepo, pkg.addArgs.join(' '), DRYRUN.toBoolean())
+                    DeployPkg(pkg, pkg.addArgs.join(' '), DRYRUN.toBoolean())
+                }
+                post {
+                    always {
+                        Notify(pkg, pkg.isAdd, 'repo-add', DRYRUN.toBoolean())
+                    }
                 }
             }
             stage('Remove') {
@@ -72,7 +78,12 @@ def call(def pkg) {
                     expression { return pkg.isRemove }
                 }
                 steps {
-                    DeployPkg(pkg.pkgRepo, pkg.rmArgs.join(' '), DRYRUN.toBoolean())
+                    DeployPkg(pkg, pkg.rmArgs.join(' '), DRYRUN.toBoolean())
+                }
+                post {
+                    always {
+                        Notify(pkg, pkg.isRemove, 'repo-remove', DRYRUN.toBoolean())
+                    }
                 }
             }
         }

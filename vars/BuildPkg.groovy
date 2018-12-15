@@ -1,7 +1,10 @@
 #!/usr/bin/env groovy
 
-def call(String repo, String cmd, Boolean debug){
-    dir(repo) {
+def call(def pkg, Boolean debug){
+
+    String cmd = pkg.buildArgs.join(' ')
+
+    dir(pkg.pkgRepo) {
         if ( debug ) {
             echo "${cmd}"
         } else {

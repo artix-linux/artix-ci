@@ -1,8 +1,16 @@
 #!/usr/bin/env groovy
 
-def call(String repo, String cmd, Boolean debug){
-    if ( fileExists(repo + '/PKGBUILD') ) {
-        dir(repo) {
+def call(def pkg, String cmd, Boolean debug){
+
+    if ( pkg.repoList.size() > 0 ) {
+        String pkgYaml = sh(returnStdout: true, script: "pkg2yaml ${pkg.pkgRepo}")
+        def pkgBuild = readYaml text: pkgYaml
+        pkg.pkgName = pkgBuild.pkgname
+    }
+    echo "pkgName: ${pkg.pkgName}"
+
+    if ( fileExists(pkg.pkgRepo + '/PKGBUILD') ) {
+        dir(pkg.pkgRepo) {
             if ( debug ) {
                 echo "${cmd}"
             } else {

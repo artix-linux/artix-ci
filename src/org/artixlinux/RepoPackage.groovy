@@ -13,6 +13,9 @@ class RepoPackage implements Serializable {
     private Boolean isBuild = false
     private Boolean isBuildSuccess = false
     private List<String> repoList = []
+    private String repoAdd = ''
+    private String repoRemove = ''
+    private List<String> pkgName = []
 
     private Map artixRepos = [
         system: [name: 'system', git: 'core', arch: 'core-x86_64', any: 'core-any'],
@@ -42,6 +45,13 @@ class RepoPackage implements Serializable {
         agentLabel = value
     }
 
+    def getPkgName() {
+        pkgName
+    }
+    def setPkgName(value) {
+        pkgName = value
+    }
+
     def getRepoList() {
         repoList
     }
@@ -55,6 +65,14 @@ class RepoPackage implements Serializable {
 
     def getRmArgs() {
         rmArgs
+    }
+
+    def getRepoAdd() {
+        repoAdd
+    }
+
+    def getRepoRemove() {
+        repoRemove
     }
 
     def getBuildArgs() {
@@ -199,9 +217,6 @@ class RepoPackage implements Serializable {
         byte repoCount = repoList.size()
 
         if ( repoCount > 0 ) {
-
-            String repoAdd = ''
-            String repoRemove = ''
 
             String srcRepo = repoList[0].path.tokenize('/')[1]
 
