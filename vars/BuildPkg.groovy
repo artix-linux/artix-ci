@@ -2,7 +2,7 @@
 
 def call(def pkg, Boolean debug){
 
-    String cmd = pkg.buildArgs.join(' ')
+    String cmd = pkg.buildCmd
 
     dir(pkg.pkgRepo) {
         if ( debug ) {

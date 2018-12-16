@@ -4,10 +4,12 @@ def call(def pkg, String cmd, Boolean debug){
 
     if ( pkg.repoList.size() > 0 ) {
         String pkgYaml = sh(returnStdout: true, script: "pkg2yaml ${pkg.pkgRepo}")
-        def pkgBuild = readYaml text: pkgYaml
-        pkg.pkgName = pkgBuild.pkgname
+        def pkgInfo = readYaml text: pkgYaml
+        pkg.pkgName = pkgInfo.pkgname
+        pkg.pkgFile = pkgInfo.pkgfile
     }
-    echo "pkgName: ${pkg.pkgName}"
+//     echo "pkgName: ${pkg.pkgName}"
+//     echo "pkgFile: ${pkg.pkgFile}"
 
     if ( fileExists(pkg.pkgRepo + '/PKGBUILD') ) {
         dir(pkg.pkgRepo) {

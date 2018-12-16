@@ -64,7 +64,7 @@ def call(def pkg) {
                     }
                 }
                 steps {
-                    DeployPkg(pkg, pkg.addArgs.join(' '), DRYRUN.toBoolean())
+                    DeployPkg(pkg, pkg.repoAddCmd, DRYRUN.toBoolean())
                 }
                 post {
                     always {
@@ -78,7 +78,7 @@ def call(def pkg) {
                     expression { return pkg.isRemove }
                 }
                 steps {
-                    DeployPkg(pkg, pkg.rmArgs.join(' '), DRYRUN.toBoolean())
+                    DeployPkg(pkg, pkg.repoRmCmd, DRYRUN.toBoolean())
                 }
                 post {
                     always {

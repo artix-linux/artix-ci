@@ -5,9 +5,9 @@ class RepoPackage implements Serializable {
     private final Script script
     private String pkgRepo = ''
     private String agentLabel = 'master'
-    private List<String> addArgs = ['deploypkg', '-a', '-d']
-    private List<String> rmArgs = ['deploypkg', '-r', '-d']
-    private List<String> buildArgs = ['buildpkg', '-r']
+    private String buildCmd = 'buildpkg'
+    private String repoAddCmd = 'deploypkg'
+    private String repoRmCmd = 'deploypkg'
     private Boolean isAdd = false
     private Boolean isRemove = false
     private Boolean isBuild = false
@@ -16,6 +16,7 @@ class RepoPackage implements Serializable {
     private String repoAdd = ''
     private String repoRemove = ''
     private List<String> pkgName = []
+    private List<String> pkgFile = []
 
     private Map artixRepos = [
         system: [name: 'system', git: 'core', arch: 'core-x86_64', any: 'core-any'],
@@ -52,6 +53,13 @@ class RepoPackage implements Serializable {
         pkgName = value
     }
 
+    def getPkgFile() {
+        pkgFile
+    }
+    def setPkgFile(value) {
+        pkgFile = value
+    }
+
     def getRepoList() {
         repoList
     }
@@ -59,12 +67,12 @@ class RepoPackage implements Serializable {
         repoList = value
     }
 
-    def getAddArgs() {
-        addArgs
+    def getRepoAddCmd() {
+        repoAddCmd
     }
 
-    def getRmArgs() {
-        rmArgs
+    def getRepoRmCmd() {
+        repoRmCmd
     }
 
     def getRepoAdd() {
@@ -75,8 +83,8 @@ class RepoPackage implements Serializable {
         repoRemove
     }
 
-    def getBuildArgs() {
-        buildArgs
+    def getBuildCmd() {
+        buildCmd
     }
 
     def getIsAdd() {
@@ -97,7 +105,7 @@ class RepoPackage implements Serializable {
 
     void postBuild() {
         isBuildSuccess = true
-        addArgs.add('-s')
+        repoAddCmd = "${repoAddCmd} -s"
     }
 
     private Map mapRepo(String src) {
@@ -225,7 +233,7 @@ class RepoPackage implements Serializable {
                 if ( repoList[0].status == 'A' || repoList[0].status == 'M' ) {
                     isBuild = true
                     repoAdd = mapRepo(srcRepo).src
-                    buildArgs.add(repoAdd)
+                    buildCmd = "${buildCmd}-${repoAdd}"
                 } else if ( repoList[0].status == 'D' ) {
                     isRemove = true
                     repoRemove = mapRepo(srcRepo).src
@@ -264,8 +272,8 @@ class RepoPackage implements Serializable {
                     pkgRepo = repoList[1].path
                 }
             }
-            addArgs.add(repoAdd)
-            rmArgs.add(repoRemove)
+            repoAddCmd = "${repoAddCmd}-${repoAdd} -a"
+            repoRmCmd = "${repoRmCmd}-${repoRemove} -r"
         }
     }
 }
