@@ -1,12 +1,5 @@
 #!/usr/bin/env groovy
 
-// library 'loadChangeSet'
-// library 'CheckNodes'
-// library 'BuildPkg'
-// library 'Notify'
-// library 'PostBuild'
-// library 'DeployPkg'
-
 def call(def pkg) {
     pipeline {
 //         agent none
@@ -22,13 +15,10 @@ def call(def pkg) {
             stage('Prepare') {
 //                 agent { label pkg.agentLabel }
                 steps {
+                    checkout scm
                     script {
-                        checkout(scm)
-                        loadChangeSet(pkg)
-                        echo "repoList: ${pkg.repoList}"
-                        echo "pkgRepo: ${pkg.pkgRepo}"
-//                         CheckNodes(pkg)
-//                         echo "agentLabel: ${pkg.agentLabel}"
+                        pkg.initialize()
+                        echo "pkgInfo: ${pkg.pkgInfo}"
                     }
                 }
             }
@@ -38,9 +28,7 @@ def call(def pkg) {
                     expression { return pkg.isBuild }
                 }
                 steps {
-//                     script {
-//                         checkout(scm)
-//                     }
+//                     checkout scm
                     BuildPkg(pkg, DRYRUN.toBoolean())
                 }
                 post {
