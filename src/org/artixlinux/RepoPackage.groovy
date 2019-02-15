@@ -17,7 +17,7 @@ class RepoPackage implements Serializable {
 
     private List<String> repoListGit = []
 
-    private String repoPathGit = ''
+    private String repoPathGit = 'trunk'
 
     private String repoAddCmd = 'deploypkg'
     private String repoRmCmd = 'deploypkg'
@@ -256,7 +256,11 @@ class RepoPackage implements Serializable {
             isRemove = true
             repoRemove = mapRepo(srcRepo).src
         }
-        repoPathGit = repoListGit[0].path
+
+        if ( steps.fileExists(repoListGit[0].path + '/PKGBUILD') ) {
+            repoPathGit = repoListGit[0].path
+        }
+
     }
 
     private void repoPkgMove(){
