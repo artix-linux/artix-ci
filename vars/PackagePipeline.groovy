@@ -19,6 +19,7 @@ def call(def pkg) {
                     script {
                         pkg.initialize()
                         echo "pkgInfo: ${pkg.pkgInfo}"
+                        currentBuild.description = "${pkg.pkgInfo.pkgbase.fullver}"
                     }
                 }
             }
