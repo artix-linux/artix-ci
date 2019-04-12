@@ -6,7 +6,7 @@ def call(def pkg) {
         sshPublisher(
             publishers: [
                 sshPublisherDesc(
-                    configName: pkg.agentLabel,
+                    configName: orion,
                     transfers: [
                         sshTransfer(cleanRemote: false,
                         excludes: '', execCommand: '',
@@ -15,7 +15,7 @@ def call(def pkg) {
                         makeEmptyDirs: false,
                         noDefaultExcludes: false,
                         patternSeparator: '[, ]+',
-                        remoteDirectory: '/srv/pkg',
+                        remoteDirectory: '/srv/pkgpool',
                         remoteDirectorySDF: false,
                         removePrefix: '',
                         sourceFiles: '*.pkg.tar.xz')

@@ -22,8 +22,8 @@ class RepoPackage implements Serializable {
     private String repoAddCmd = 'deploypkg'
     private String repoRmCmd = 'deploypkg'
 
-    private String repoAdd = ''
-    private String repoRemove = ''
+    private String repoAdd = 'default'
+    private String repoRemove = 'default'
 
     private String buildCmd = 'buildpkg'
 
@@ -34,12 +34,24 @@ class RepoPackage implements Serializable {
 
     private String agentLabel = 'master'
 
+    private String pkgRepo = 'none'
+
+    private Map jobInfo = [:]
+
     def getArtixRepos() {
         artixRepos
     }
 
     def getPkgInfo() {
         pkgInfo
+    }
+
+    def getPkgRepo() {
+        pkgRepo
+    }
+
+    def getJobInfo() {
+        jobInfo
     }
 
     def getAuthorInfo() {
@@ -252,9 +264,11 @@ class RepoPackage implements Serializable {
             isBuild = true
             repoAdd = mapRepo(srcRepo).src
             buildCmd = "${buildCmd}-${repoAdd}"
+            pkgRepo = repoAdd
         } else if ( repoListGit[0].status == 'D' ) {
             isRemove = true
             repoRemove = mapRepo(srcRepo).src
+            pkgRepo = repoRemove
         }
 
         if ( steps.fileExists(repoListGit[0].path + '/PKGBUILD') ) {
@@ -295,6 +309,8 @@ class RepoPackage implements Serializable {
             repoRemove = mapRepos(srcRepo, destRepo).dest
             repoPathGit = repoListGit[1].path
         }
+
+        pkgRepo = repoAdd
     }
 
     private void loadReposYaml(){
@@ -336,6 +352,8 @@ class RepoPackage implements Serializable {
         String pkgYaml = steps.sh(returnStdout: true, script: "${pkgYamlCmd} ${repoPathGit}")
 
         pkgInfo = steps.readYaml(text: pkgYaml)
+
+        jobInfo << [name: "${pkgRepo]", desc: "${pkgInfo.pkgbase.pkgname}-${pkgInfo.pkgbase.fullver}"]
     }
 
     void initialize() {

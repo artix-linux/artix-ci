@@ -18,8 +18,8 @@ def call(def pkg) {
                     checkout scm
                     script {
                         pkg.initialize()
-                        echo "pkgInfo: ${pkg.pkgInfo}"
-                        currentBuild.description = "${pkg.pkgInfo.pkgbase.fullver}"
+                        currentBuild.displayName = pkg.jobInfo.name
+                        currentBuild.description = pkg.jobInfo.desc
                     }
                 }
             }
