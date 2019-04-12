@@ -353,7 +353,7 @@ class RepoPackage implements Serializable {
 
         pkgInfo = steps.readYaml(text: pkgYaml)
 
-        jobInfo << [name: "${pkgRepo]", desc: "${pkgInfo.pkgbase.pkgname}-${pkgInfo.pkgbase.fullver}"]
+        jobInfo << [name: "${pkgRepo}", desc: "${pkgInfo.pkgbase.pkgname}-${pkgInfo.pkgbase.fullver}"]
     }
 
     void initialize() {
