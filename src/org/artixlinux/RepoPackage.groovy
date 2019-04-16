@@ -15,17 +15,13 @@ class RepoPackage implements Serializable {
 
     private Map authorInfo = [:]
 
-    private List<String> repoListGit = []
+    private Map jobInfo = [:]
 
-    private String repoPathGit = 'trunk'
-
+    private String buildCmd = 'buildpkg'
     private String repoAddCmd = 'deploypkg'
     private String repoRmCmd = 'deploypkg'
 
-    private String repoAdd = 'default'
-    private String repoRemove = 'default'
-
-    private String buildCmd = 'buildpkg'
+    private String repoPathGit = 'trunk'
 
     private Boolean isAdd = false
     private Boolean isRemove = false
@@ -34,9 +30,12 @@ class RepoPackage implements Serializable {
 
     private String agentLabel = 'master'
 
-    private String pkgRepo = 'none'
+    private List<String> repoListGit = []
 
-    private Map jobInfo = [:]
+    private String repoAdd = 'default'
+    private String repoRemove = 'default'
+
+    private String pkgRepo = 'none'
 
     def getArtixRepos() {
         artixRepos
@@ -46,24 +45,16 @@ class RepoPackage implements Serializable {
         pkgInfo
     }
 
-    def getPkgRepo() {
-        pkgRepo
+    def getAuthorInfo() {
+        authorInfo
     }
 
     def getJobInfo() {
         jobInfo
     }
 
-    def getAuthorInfo() {
-        authorInfo
-    }
-
-    def getRepoListGit() {
-        repoListGit
-    }
-
-    def getRepoPathGit() {
-        repoPathGit
+    def getBuildCmd() {
+        buildCmd
     }
 
     def getRepoAddCmd() {
@@ -74,16 +65,8 @@ class RepoPackage implements Serializable {
         repoRmCmd
     }
 
-    def getRepoAdd() {
-        repoAdd
-    }
-
-    def getRepoRemove() {
-        repoRemove
-    }
-
-    def getBuildCmd() {
-        buildCmd
+    def getRepoPathGit() {
+        repoPathGit
     }
 
     def getIsAdd() {

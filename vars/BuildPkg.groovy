@@ -1,11 +1,11 @@
 #!/usr/bin/env groovy
 
-def call(def pkg, Boolean debug){
+def call(def pkg, Boolean dryrun){
 
     String cmd = pkg.buildCmd
 
     dir(pkg.repoPathGit) {
-        if ( debug ) {
+        if ( dryrun ) {
             echo "${cmd}"
         } else {
             sh "${cmd}"

@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-def call(def pkg, Boolean repoops, String msg, Boolean debug) {
+def call(def pkg, Boolean repoops, String msg, Boolean dryrun) {
     String subject = "${msg}: ${pkg.pkgInfo.pkgbase.pkgname}"
     String body = ''
     String bodyInfo = ""
@@ -14,13 +14,12 @@ def call(def pkg, Boolean repoops, String msg, Boolean debug) {
     String sendTo = 'artix-builds@artixlinux.org'
 
     if ( repoops ) {
+        bodyInfo = "<p>Packages: ${pkg.pkgInfo.pkgfile}</p>"
+        bodyAction = "<p>Repo: ${pkg.jobInfo.name}</p>"
+
         if ( msg == 'repo-add' ) {
-            bodyInfo = "<p>Packages: ${pkg.pkgInfo.pkgfile}</p>"
-            bodyAction = "<p>Repo: ${pkg.repoAdd}</p>"
             sendMail = true
         } else if ( msg == 'repo-remove' ) {
-            bodyInfo = "<p>Packages: ${pkg.pkgInfo.pkgfile}</p>"
-            bodyAction = "<p>Repo: ${pkg.repoRemove}</p>"
             if ( ! pkg.isBuildSuccess ) {
                 sendMail = true
             }
@@ -40,7 +39,7 @@ def call(def pkg, Boolean repoops, String msg, Boolean debug) {
     body = "${bodyRepo}${bodyAction}${bodyInfo}${bodyAuthor}${bodyUrl}"
 
     if ( sendMail ) {
-        if ( ! debug ) {
+        if ( ! dryrun ) {
             emailext (
                 body: body,
                 subject: subject,

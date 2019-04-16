@@ -2,18 +2,16 @@
 
 def call(def pkg) {
     pipeline {
-//         agent none
         agent any
         options {
             skipDefaultCheckout()
             timestamps()
         }
-        environment {
-            DRYRUN = false
+        parameters {
+            booleanParam(name: 'isDryRun', defaultValue: false, description: 'Disable build and deploy commands?')
         }
         stages {
             stage('Prepare') {
-//                 agent { label pkg.agentLabel }
                 steps {
                     checkout scm
                     script {
@@ -24,25 +22,22 @@ def call(def pkg) {
                 }
             }
             stage('Build') {
-//                 agent { label pkg.agentLabel }
                 when {
                     expression { return pkg.isBuild }
                 }
                 steps {
-//                     checkout scm
-                    BuildPkg(pkg, DRYRUN.toBoolean())
+                    BuildPkg(pkg, params.isDryRun)
                 }
                 post {
                     success {
                         PostBuild(pkg)
                     }
                     failure {
-                        Notify(pkg, false, 'Failure', DRYRUN.toBoolean())
+                        Notify(pkg, false, 'Failure', params.isDryRun)
                     }
                 }
             }
             stage('Add') {
-//                 agent { label 'master' }
                 environment {
                     BUILDBOT_GPGP = credentials('BUILDBOT_GPGP')
                 }
@@ -53,25 +48,24 @@ def call(def pkg) {
                     }
                 }
                 steps {
-                    DeployPkg(pkg, pkg.repoAddCmd, DRYRUN.toBoolean())
+                    DeployPkg(pkg, pkg.repoAddCmd, params.isDryRun)
                 }
                 post {
                     always {
-                        Notify(pkg, pkg.isAdd, 'repo-add', DRYRUN.toBoolean())
+                        Notify(pkg, pkg.isAdd, 'repo-add', params.isDryRun)
                     }
                 }
             }
             stage('Remove') {
-//                 agent { label 'master' }
                 when {
                     expression { return pkg.isRemove }
                 }
                 steps {
-                    DeployPkg(pkg, pkg.repoRmCmd, DRYRUN.toBoolean())
+                    DeployPkg(pkg, pkg.repoRmCmd, params.isDryRun)
                 }
                 post {
                     always {
-                        Notify(pkg, pkg.isRemove, 'repo-remove', DRYRUN.toBoolean())
+                        Notify(pkg, pkg.isRemove, 'repo-remove', params.isDryRun)
                     }
                 }
             }
