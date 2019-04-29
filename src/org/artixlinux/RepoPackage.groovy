@@ -357,8 +357,8 @@ class RepoPackage implements Serializable {
 
                 repoPkgMove()
             }
-            repoAddCmd = "${repoAddCmd}-${repoAdd} -a"
-            repoRmCmd = "${repoRmCmd}-${repoRemove} -r"
+            repoAddCmd = "${repoAddCmd}-${repoAdd} -a -l"
+            repoRmCmd = "${repoRmCmd}-${repoRemove} -r -l"
 
             loadPkgYaml()
 
