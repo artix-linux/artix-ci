@@ -1,9 +1,9 @@
 #!/usr/bin/env groovy
 
 def call(def pkg, Boolean repoops, String msg, Boolean dryrun) {
-    String subject = "${msg}: ${pkg.pkgInfo.pkgbase.pkgname}"
+    String subject = ''
     String body = ''
-    String bodyInfo = ""
+    String bodyInfo = ''
     String bodyAction = ''
     String bodyRepo = "<p><strong>${msg}</strong></p>"
     String bodyAuthor = "<p>authorName: ${pkg.authorInfo.name}</p><p>authorEmail: ${pkg.authorInfo.email}</p>"
@@ -15,16 +15,20 @@ def call(def pkg, Boolean repoops, String msg, Boolean dryrun) {
 
     if ( repoops ) {
         bodyInfo = "<p>Packages: ${pkg.pkgInfo.pkgfile}</p>"
-        bodyAction = "<p>Repo: ${pkg.jobInfo.name}</p>"
 
         if ( msg == 'repo-add' ) {
             sendMail = true
+            subject = "[${pkg.repoAdd}] ${msg}: ${pkg.pkgInfo.pkgbase.pkgname}"
+            bodyAction = "<p>Repo: ${pkg.repoAdd}</p>"
         } else if ( msg == 'repo-remove' ) {
             if ( ! pkg.isBuildSuccess ) {
                 sendMail = true
+                subject = "[${pkg.repoRemove}] ${msg}: ${pkg.pkgInfo.pkgbase.pkgname}"
+                bodyAction = "<p>Repo: ${pkg.repoRemove}</p>"
             }
         }
     } else {
+        subject = "[${pkg.repoAdd}] ${msg}: ${pkg.pkgInfo.pkgbase.pkgname}"
         bodyInfo = "<p>Job: ${JOB_NAME}</p><p>Packages: ${pkg.pkgInfo.pkgfile}</p>"
         bodyAction = "<p>Build: ${pkg.repoPathGit}</p>"
 

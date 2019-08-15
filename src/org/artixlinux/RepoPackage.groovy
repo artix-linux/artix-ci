@@ -65,6 +65,14 @@ class RepoPackage implements Serializable {
         repoRmCmd
     }
 
+    def getRepoAdd() {
+        repoAdd
+    }
+
+    def getRepoRemove() {
+        repoRemove
+    }
+
     def getRepoPathGit() {
         repoPathGit
     }
