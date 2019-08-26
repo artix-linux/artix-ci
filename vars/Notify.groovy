@@ -26,7 +26,7 @@ def call(def pkg, String msg) {
             sendTo = 'artix-builds@artixlinux.org'
         }
     } else {
-        if ( msg == 'Failure' && pkg.isBuild ) {
+        if ( msg == 'Failure' ) {
             sendMail = true
             isLogAttach = true
             subject = "[${pkg.repoAdd}] ${msgSubject}"
