@@ -13,12 +13,7 @@ def call(def pkg) {
         stages {
             stage('Prepare') {
                 steps {
-                    checkout scm
-                    script {
-                        pkg.initialize()
-                        currentBuild.displayName = pkg.jobInfo.name
-                        currentBuild.description = pkg.jobInfo.desc
-                    }
+                    CheckOut(pkg)
                 }
             }
             stage('Build') {
@@ -26,14 +21,14 @@ def call(def pkg) {
                     expression { return pkg.isBuild }
                 }
                 steps {
-                    BuildPkg(pkg, params.isDryRun)
+                    BuildPkg(pkg)
                 }
                 post {
                     success {
                         PostBuild(pkg)
                     }
                     failure {
-                        Notify(pkg, false, 'Failure', params.isDryRun)
+                        Notify(pkg, 'Failure')
                     }
                 }
             }
@@ -48,11 +43,11 @@ def call(def pkg) {
                     }
                 }
                 steps {
-                    DeployPkg(pkg, pkg.repoAddCmd, params.isDryRun)
+                    DeployPkg(pkg, pkg.repoAddCmd)
                 }
                 post {
                     always {
-                        Notify(pkg, pkg.isAdd, 'repo-add', params.isDryRun)
+                        Notify(pkg, 'repo-add')
                     }
                 }
             }
@@ -61,11 +56,11 @@ def call(def pkg) {
                     expression { return pkg.isRemove }
                 }
                 steps {
-                    DeployPkg(pkg, pkg.repoRmCmd, params.isDryRun)
+                    DeployPkg(pkg, pkg.repoRmCmd)
                 }
                 post {
                     always {
-                        Notify(pkg, pkg.isRemove, 'repo-remove', params.isDryRun)
+                        Notify(pkg, 'repo-remove')
                     }
                 }
             }

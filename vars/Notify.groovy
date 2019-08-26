@@ -1,49 +1,42 @@
 #!/usr/bin/env groovy
 
-def call(def pkg, Boolean repoops, String msg, Boolean dryrun) {
+def call(def pkg, String msg) {
+    Boolean sendMail = false
+    Boolean isLogAttach = false
+
+    String msgSubject = "${msg}: ${pkg.pkgInfo.pkgbase.pkgname}"
     String subject = ''
-    String body = ''
-    String bodyInfo = ''
     String bodyAction = ''
+    String bodyInfo = "<p>Packages: </p><p>${pkg.pkgInfo.pkgfile}</p>"
     String bodyRepo = "<p><strong>${msg}</strong></p>"
     String bodyAuthor = "<p>authorName: ${pkg.authorInfo.name}</p><p>authorEmail: ${pkg.authorInfo.email}</p>"
     String bodyUrl = "<p><a href=${BUILD_URL}>${BUILD_URL}</a></p>"
-
-    Boolean sendMail = false
-    Boolean isLogAttach = false
     String sendTo = 'artix-builds@artixlinux.org'
 
-    if ( repoops ) {
-        bodyInfo = "<p>Packages: ${pkg.pkgInfo.pkgfile}</p>"
-
-        if ( msg == 'repo-add' ) {
+    if ( pkg.repoAdd ) {
+        sendMail = true
+        subject = "[${pkg.repoAdd}] ${msgSubject}"
+        bodyAction = "<p>Repo: ${pkg.repoAdd}</p>"
+    } else if ( pkg.repoRemove ) {
+        if ( ! pkg.isBuildSuccess ) {
             sendMail = true
-            subject = "[${pkg.repoAdd}] ${msg}: ${pkg.pkgInfo.pkgbase.pkgname}"
-            bodyAction = "<p>Repo: ${pkg.repoAdd}</p>"
-        } else if ( msg == 'repo-remove' ) {
-            if ( ! pkg.isBuildSuccess ) {
-                sendMail = true
-                subject = "[${pkg.repoRemove}] ${msg}: ${pkg.pkgInfo.pkgbase.pkgname}"
-                bodyAction = "<p>Repo: ${pkg.repoRemove}</p>"
-            }
+            subject = "[${pkg.repoRemove}] ${msgSubject}"
+            bodyAction = "<p>Repo: ${pkg.repoRemove}</p>"
         }
     } else {
-        subject = "[${pkg.repoAdd}] ${msg}: ${pkg.pkgInfo.pkgbase.pkgname}"
-        bodyInfo = "<p>Job: ${JOB_NAME}</p><p>Packages: ${pkg.pkgInfo.pkgfile}</p>"
-        bodyAction = "<p>Build: ${pkg.repoPathGit}</p>"
-
-        sendMail = true
-
         if ( msg == 'Failure' ) {
-            sendTo = 'artix-build-failures@artixlinux.org'
+            sendMail = true
             isLogAttach = true
+            subject = "[${pkg.repoAdd}] ${msgSubject}"
+            bodyAction = "<p>Build: ${pkg.repoPathGit}</p>"
+            sendTo = 'artix-build-failures@artixlinux.org'
         }
     }
 
-    body = "${bodyRepo}${bodyAction}${bodyInfo}${bodyAuthor}${bodyUrl}"
+    String body = "${bodyRepo}${bodyAction}${bodyInfo}${bodyAuthor}${bodyUrl}"
 
     if ( sendMail ) {
-        if ( ! dryrun ) {
+        if ( ! params.isDryRun ) {
             emailext (
                 body: body,
                 subject: subject,

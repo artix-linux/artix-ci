@@ -27,8 +27,7 @@ class RepoPackage implements Serializable {
     private Boolean isRemove = false
     private Boolean isBuild = false
     private Boolean isBuildSuccess = false
-
-    private String agentLabel = 'master'
+    private Boolean isRebuild = false
 
     private List<String> repoListGit = []
 
@@ -89,29 +88,23 @@ class RepoPackage implements Serializable {
         isBuild
     }
 
+    def getIsRebuild() {
+        isRebuild
+    }
+    def setIsRebuild(value) {
+        isRebuild = value
+        if ( value ) {
+            buildCmd += " -m"
+        }
+    }
+
     def getIsBuildSuccess() {
         isBuildSuccess
     }
     def setIsBuildSuccess(value) {
         isBuildSuccess = value
-        repoAddCmd = "${repoAddCmd} -s"
-    }
-
-    def getAgentLabel() {
-        agentLabel
-    }
-
-    private void checkNodes() {
-        String agentYaml = '.artixlinux/agent.yaml'
-        if ( steps.fileExists(agentYaml) ) {
-            def data = steps.readYaml(file: agentYaml)
-
-            if ( data.label == 'slave' ){
-                def nodesOnline = steps.nodesByLabel(label: data.label)
-                if ( nodesOnline.size() > 0 ) {
-                    agentLabel = data.label
-                }
-            }
+        if ( value ) {
+            repoAddCmd += " -s"
         }
     }
 
@@ -254,7 +247,7 @@ class RepoPackage implements Serializable {
         if ( repoListGit[0].status == 'A' || repoListGit[0].status == 'M' ) {
             isBuild = true
             repoAdd = mapRepo(srcRepo).src
-            buildCmd = "${buildCmd}-${repoAdd}"
+            buildCmd += "-${repoAdd}"
             pkgRepo = repoAdd
         } else if ( repoListGit[0].status == 'D' ) {
             isRemove = true
@@ -365,12 +358,10 @@ class RepoPackage implements Serializable {
 
                 repoPkgMove()
             }
-            repoAddCmd = "${repoAddCmd}-${repoAdd} -a -l"
-            repoRmCmd = "${repoRmCmd}-${repoRemove} -r -l"
+            repoAddCmd += "-${repoAdd} -a -l"
+            repoRmCmd += "-${repoRemove} -r -l"
 
             loadPkgYaml()
-
-//             checkNodes()
         }
     }
 }
