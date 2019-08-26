@@ -11,20 +11,22 @@ def call(def pkg, String msg) {
     String bodyRepo = "<p><strong>${msg}</strong></p>"
     String bodyAuthor = "<p>authorName: ${pkg.authorInfo.name}</p><p>authorEmail: ${pkg.authorInfo.email}</p>"
     String bodyUrl = "<p><a href=${BUILD_URL}>${BUILD_URL}</a></p>"
-    String sendTo = 'artix-builds@artixlinux.org'
+    String sendTo = ''
 
-    if ( pkg.repoAdd ) {
+    if ( msg == 'repo-add' ) {
         sendMail = true
         subject = "[${pkg.repoAdd}] ${msgSubject}"
         bodyAction = "<p>Repo: ${pkg.repoAdd}</p>"
-    } else if ( pkg.repoRemove ) {
+        sendTo = 'artix-builds@artixlinux.org'
+    } else if ( msg == 'repo-remove' ) {
         if ( ! pkg.isBuildSuccess ) {
             sendMail = true
             subject = "[${pkg.repoRemove}] ${msgSubject}"
             bodyAction = "<p>Repo: ${pkg.repoRemove}</p>"
+            sendTo = 'artix-builds@artixlinux.org'
         }
     } else {
-        if ( msg == 'Failure' ) {
+        if ( msg == 'Failure' && pkg.isBuild ) {
             sendMail = true
             isLogAttach = true
             subject = "[${pkg.repoAdd}] ${msgSubject}"
