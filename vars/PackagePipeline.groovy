@@ -7,9 +7,6 @@ def call(def pkg) {
             skipDefaultCheckout()
             timestamps()
         }
-        parameters {
-            booleanParam(name: 'isDryRun', defaultValue: false, description: 'Disable build and deploy commands?')
-        }
         stages {
             stage('Prepare') {
                 steps {
@@ -17,51 +14,41 @@ def call(def pkg) {
                 }
             }
             stage('Build') {
+                environment {
+                    BUILDBOT_GPGP = credentials('BUILDBOT_GPGP')
+//                     BUILDBOT_GPGP = credentials("${pkg.authorInfo.gpgkey}")
+                }
                 when {
-                    expression { return pkg.isBuild }
+                    expression { return pkg.pkgActions.isBuild }
                 }
                 steps {
                     BuildPkg(pkg)
                 }
                 post {
-                    success {
-                        PostBuild(pkg)
-                    }
-                    failure {
-                        Notify(pkg, 'Failure')
-                    }
+                    success { PostBuild(pkg) }
+                    failure { NotifyFail(pkg) }
                 }
             }
             stage('Add') {
-                environment {
-                    BUILDBOT_GPGP = credentials('BUILDBOT_GPGP')
-                }
                 when {
-                    anyOf {
-                        expression { return pkg.isAdd }
-                        expression { return pkg.isBuildSuccess }
-                    }
+                    expression { return pkg.pkgActions.isAdd }
                 }
                 steps {
-                    DeployPkg(pkg, pkg.repoAddCmd)
+                    RepoAdd(pkg)
                 }
                 post {
-                    always {
-                        Notify(pkg, 'repo-add')
-                    }
+                    always { NotifyRepoAdd(pkg) }
                 }
             }
             stage('Remove') {
                 when {
-                    expression { return pkg.isRemove }
+                    expression { return pkg.pkgActions.isRemove }
                 }
                 steps {
-                    DeployPkg(pkg, pkg.repoRmCmd)
+                    RepoRemove(pkg)
                 }
                 post {
-                    always {
-                        Notify(pkg, 'repo-remove')
-                    }
+                    always { NotifyRepoRemove(pkg) }
                 }
             }
         }

@@ -11,33 +11,28 @@ class RepoPackage implements Serializable {
 
     private Map artixRepos = [:]
 
+    private Map artixTools = [:]
+
     private Map pkgInfo = [:]
+
+    private Map pkgActions = [:]
 
     private Map authorInfo = [:]
 
     private Map jobInfo = [:]
 
-    private String buildCmd = 'buildpkg'
-    private String repoAddCmd = 'deploypkg'
-    private String repoRmCmd = 'deploypkg'
-
-    private String repoPathGit = 'trunk'
-
-    private Boolean isAdd = false
-    private Boolean isRemove = false
-    private Boolean isBuild = false
-    private Boolean isBuildSuccess = false
-    private Boolean isRebuild = false
-
     private List<String> repoListGit = []
-
-    private String repoAdd = 'default'
-    private String repoRemove = 'default'
-
-    private String pkgRepo = 'none'
 
     def getArtixRepos() {
         artixRepos
+    }
+
+    def getArtixTools() {
+        artixTools
+    }
+
+    def getPkgActions() {
+        pkgActions
     }
 
     def getPkgInfo() {
@@ -50,62 +45,6 @@ class RepoPackage implements Serializable {
 
     def getJobInfo() {
         jobInfo
-    }
-
-    def getBuildCmd() {
-        buildCmd
-    }
-
-    def getRepoAddCmd() {
-        repoAddCmd
-    }
-
-    def getRepoRmCmd() {
-        repoRmCmd
-    }
-
-    def getRepoAdd() {
-        repoAdd
-    }
-
-    def getRepoRemove() {
-        repoRemove
-    }
-
-    def getRepoPathGit() {
-        repoPathGit
-    }
-
-    def getIsAdd() {
-        isAdd
-    }
-
-    def getIsRemove() {
-        isRemove
-    }
-
-    def getIsBuild() {
-        isBuild
-    }
-
-    def getIsRebuild() {
-        isRebuild
-    }
-    def setIsRebuild(value) {
-        isRebuild = value
-        if ( value ) {
-            buildCmd += " -m"
-        }
-    }
-
-    def getIsBuildSuccess() {
-        isBuildSuccess
-    }
-    def setIsBuildSuccess(value) {
-        isBuildSuccess = value
-        if ( value ) {
-            repoAddCmd += " -s"
-        }
     }
 
     private Map mapRepo(String src) {
@@ -245,18 +184,17 @@ class RepoPackage implements Serializable {
         String srcRepo = repoListGit[0].path.tokenize('/')[1]
 
         if ( repoListGit[0].status == 'A' || repoListGit[0].status == 'M' ) {
-            isBuild = true
-            repoAdd = mapRepo(srcRepo).src
-            buildCmd += "-${repoAdd}"
-            pkgRepo = repoAdd
+            pkgActions.isBuild = true
+            artixTools.repoAddName = mapRepo(srcRepo).src
+            artixTools.repoName = artixTools.repoAddName
         } else if ( repoListGit[0].status == 'D' ) {
-            isRemove = true
-            repoRemove = mapRepo(srcRepo).src
-            pkgRepo = repoRemove
+            pkgActions.isRemove = true
+            artixTools.repoRemoveName = mapRepo(srcRepo).src
+            artixTools.repoName = artixTools.repoRemoveName
         }
 
         if ( steps.fileExists(repoListGit[0].path + '/PKGBUILD') ) {
-            repoPathGit = repoListGit[0].path
+            artixTools.repoPathGit = repoListGit[0].path
         }
 
     }
@@ -267,39 +205,45 @@ class RepoPackage implements Serializable {
         String destRepo = repoListGit[1].path.tokenize('/')[1]
 
         if ( repoListGit[0].status == 'M' ) {
-            isAdd = true
-            repoAdd = mapRepo(srcRepo).src
-            repoPathGit = repoListGit[1].path
+            pkgActions.isAdd = true
+            artixTools.repoAddName = mapRepo(srcRepo).src
+            artixTools.repoPathGit = repoListGit[1].path
         } else if ( repoListGit[1].status == 'M' ) {
-            isAdd = true
-            repoAdd = mapRepo(destRepo).src
-            repoPathGit = repoListGit[0].path
+            pkgActions.isAdd = true
+            artixTools.repoAddName = mapRepo(destRepo).src
+            artixTools.repoPathGit = repoListGit[0].path
         }
 
         if ( repoListGit[0].status == 'D' ) {
-            isRemove = true
-            repoRemove = mapRepo(srcRepo).src
-            repoPathGit = repoListGit[1].path
+            pkgActions.isRemove = true
+            artixTools.repoRemoveName = mapRepo(srcRepo).src
+            artixTools.repoPathGit = repoListGit[1].path
         } else if ( repoListGit[1].status == 'D' ) {
-            isRemove = true
-            repoRemove = mapRepo(destRepo).src
-            repoPathGit = repoListGit[0].path
+            pkgActions.isRemove = true
+            artixTools.repoRemoveName = mapRepo(destRepo).src
+            artixTools.repoPathGit = repoListGit[0].path
         }
 
         if ( repoListGit[0].status.contains('R') && repoListGit[1].status.contains('R') )  {
-            isAdd = true
-            isRemove = true
-            repoAdd = mapRepos(srcRepo, destRepo).src
-            repoRemove = mapRepos(srcRepo, destRepo).dest
-            repoPathGit = repoListGit[1].path
+            pkgActions.isAdd = true
+            pkgActions.isRemove = true
+            artixTools.repoAddName = mapRepos(srcRepo, destRepo).src
+            artixTools.repoRemoveName = mapRepos(srcRepo, destRepo).dest
+            artixTools.repoPathGit = repoListGit[1].path
         }
 
-        pkgRepo = repoAdd
+        artixTools.repoName = artixTools.repoAddName
     }
 
-    private void loadReposYaml(){
+    private void loadResources(){
         def repos = steps.libraryResource('org/artixlinux/repos/artixRepos.yaml')
         artixRepos = steps.readYaml(text: repos)
+
+        def conf = steps.libraryResource('org/artixlinux/tools/artixTools.yaml')
+        artixTools = steps.readYaml(text: conf)
+
+        def actions = steps.libraryResource('org/artixlinux/actions/artixActions.yaml')
+        pkgActions = steps.readYaml(text: actions)
     }
 
     private void loadChangeSet() {
@@ -309,10 +253,12 @@ class RepoPackage implements Serializable {
         gitCmd = "git show -s --format='%an' ${commit}"
         String authorName = steps.sh(returnStdout: true, script: gitCmd)
 
+        String authorGpg = "GPG_" + authorName.toUpperCase()
+
         gitCmd = "git show -s --format='%ae' ${commit}"
         String authorEmail = steps.sh(returnStdout: true, script: gitCmd)
 
-        authorInfo = [name: authorName, email: authorEmail]
+        authorInfo = [name: authorName, email: authorEmail, gpgkey: authorGpg]
 
         gitCmd = "git show --pretty=format: --name-status ${commit}"
         List<String> changeSet = steps.sh(returnStdout: true, script: gitCmd).tokenize('\n')
@@ -331,18 +277,16 @@ class RepoPackage implements Serializable {
 
     private void loadPkgYaml() {
 
-        String pkgYamlCmd = 'pkg2yaml'
-
-        String pkgYaml = steps.sh(returnStdout: true, script: "${pkgYamlCmd} ${repoPathGit}")
+        String pkgYaml = steps.sh(returnStdout: true, script: "${artixTools.yamlCmd} ${artixTools.repoPathGit}")
 
         pkgInfo = steps.readYaml(text: pkgYaml)
 
-        jobInfo << [name: "${pkgRepo}", desc: "${pkgInfo.pkgbase.pkgname}-${pkgInfo.pkgbase.fullver}"]
+        jobInfo << [name: "${artixTools.repoName}", desc: "${pkgInfo.pkgbase.pkgname}-${pkgInfo.pkgbase.fullver}"]
     }
 
     void initialize() {
 
-        loadReposYaml()
+        loadResources()
 
         loadChangeSet()
 
@@ -358,10 +302,7 @@ class RepoPackage implements Serializable {
 
                 repoPkgMove()
             }
-            repoAddCmd += "-${repoAdd} -a -l"
-            repoRmCmd += "-${repoRemove} -r -l"
-
-            loadPkgYaml()
         }
+        loadPkgYaml()
     }
 }

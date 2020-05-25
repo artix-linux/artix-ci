@@ -1,0 +1,19 @@
+---
+
+buildCmd: 'buildpkg -C'
+
+repoAddCmd: 'deploypkg -a -l'
+
+repoRemoveCmd: 'deploypkg -r -l'
+
+signCmd: 'signpkg'
+
+yamlCmd: 'pkg2yaml -d'
+
+repoPathGit: 'trunk'
+
+repoAddName: 'default'
+
+repoRemoveName: 'default'
+
+repoName: 'trunk'
