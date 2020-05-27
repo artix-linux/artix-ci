@@ -1,0 +1,43 @@
+---
+
+repos:
+  - name: 'goblins'
+    arch: ['staging-x86_64', 'staging-any']
+  - name: 'gremlins'
+    arch: ['testing-x86_64', 'testing-any']
+  - name: 'system'
+    arch: ['core-x86_64', 'core-any']
+  - name: 'world'
+    arch: ['extra-x86_64', 'extra-any']
+  - name: 'galaxy-goblins'
+    arch: ['community-staging-x86_64', 'community-staging-any']
+  - name: 'galaxy-gremlins'
+    arch: ['community-testing-x86_64', 'community-testing-any']
+  - name: 'galaxy'
+    arch: ['community-x86_64', 'community-any']
+  - name: 'lib32-goblins'
+    arch: ['multilib-staging-x86_64']
+  - name: 'lib32-gremlins'
+    arch: ['multilib-testing-x86_64']
+  - name: 'lib32'
+    arch: ['multilib-x86_64']
+  - name: 'kde-wobble'
+    arch: ['kde-unstable-x86_64', 'kde-unstable-any']
+  - name: 'gnome-wobble'
+    arch: ['gnome-unstable-x86_64', 'gnome-unstable-any']
+
+tools:
+    buildCmd: 'buildpkg -C'
+    repoAddCmd: 'deploypkg -a -l'
+    repoRemoveCmd: 'deploypkg -r -l'
+    signCmd: 'signpkg'
+    yamlCmd: 'pkg2yaml -d'
+    repoPathGit: 'trunk'
+    repoAddName: 'default'
+    repoRemoveName: 'default'
+    repoName: 'trunk'
+
+actions:
+    isAdd: false
+    isRemove: false
+    isBuild: false

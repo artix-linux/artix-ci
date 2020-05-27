@@ -1,8 +1,8 @@
 #!/usr/bin/env groovy
 
 def call(def pkg) {
-    pkg.artixTools.repoRemoveCmd += " -d ${pkg.artixTools.repoRemoveName}"
+    pkg.artixConfig.tools.repoRemoveCmd += " -d ${pkg.artixConfig.tools.repoRemoveName}"
     catchError(message: "Errors occurred.", buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-        sh "${pkg.artixTools.repoRemoveCmd} ${pkg.pkgInfo.pkgfile.join(' ')}"
+        sh "${pkg.artixConfig.tools.repoRemoveCmd} ${pkg.pkgInfo.pkgfile.join(' ')}"
     }
 }

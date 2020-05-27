@@ -4,8 +4,8 @@ def call(def pkg) {
     String msg = 'repo-remove'
 
     String msgSubject = "${msg}: ${pkg.pkgInfo.pkgbase.pkgname}"
-    String subject = "[${pkg.artixTools.repoRemoveName}] ${msgSubject}"
-    String bodyAction = "<p>Repo: ${pkg.artixTools.repoRemoveName}</p>"
+    String subject = "[${pkg.artixConfig.tools.repoRemoveName}] ${msgSubject}"
+    String bodyAction = "<p>Repo: ${pkg.artixConfig.tools.repoRemoveName}</p>"
     String bodyInfo = "<p>Packages: </p><p>${pkg.pkgInfo.pkgfile.join('\n')}</p>"
     String bodyRepo = "<p><strong>${msg}</strong></p>"
     String bodyAuthor = "<p>authorName: ${pkg.authorInfo.name}</p><p>authorEmail: ${pkg.authorInfo.email}</p>"
@@ -14,10 +14,5 @@ def call(def pkg) {
 
     String body = "${bodyRepo}${bodyAction}${bodyInfo}${bodyAuthor}${bodyUrl}"
 
-    emailext (
-        body: body,
-        subject: subject,
-        to: sendTo,
-        attachLog: false
-    )
+    emailext (body: body, subject: subject, to: sendTo, attachLog: false)
 }

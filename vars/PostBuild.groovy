@@ -1,9 +1,9 @@
 #!/usr/bin/env groovy
 
 def call(def pkg) {
-    sh "${pkg.artixTools.signCmd} ${pkg.pkgInfo.pkgfile.join(' ')}"
+    sh "${pkg.artixConfig.tools.signCmd} ${pkg.pkgInfo.pkgfile.join(' ')}"
 
-    pkg.pkgActions.isAdd = true
+    pkg.artixConfig.actions.isAdd = true
 
     archiveArtifacts(allowEmptyArchive: true, artifacts: 'repos/**/*.log')
 }

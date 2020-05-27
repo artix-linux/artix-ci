@@ -19,7 +19,7 @@ def call(def pkg) {
 //                     BUILDBOT_GPGP = credentials("${pkg.authorInfo.gpgkey}")
                 }
                 when {
-                    expression { return pkg.pkgActions.isBuild }
+                    expression { return pkg.artixConfig.actions.isBuild }
                 }
                 steps {
                     BuildPkg(pkg)
@@ -31,7 +31,7 @@ def call(def pkg) {
             }
             stage('Add') {
                 when {
-                    expression { return pkg.pkgActions.isAdd }
+                    expression { return pkg.artixConfig.actions.isAdd }
                 }
                 steps {
                     RepoAdd(pkg)
@@ -42,7 +42,7 @@ def call(def pkg) {
             }
             stage('Remove') {
                 when {
-                    expression { return pkg.pkgActions.isRemove }
+                    expression { return pkg.artixConfig.actions.isRemove }
                 }
                 steps {
                     RepoRemove(pkg)
