@@ -1,41 +1,68 @@
 ---
 
+arch: 'x86_64'
+
+pkgbuild: '/PKGBUILD'
+
 repos:
   - name: 'goblins'
-    arch: ['staging-x86_64', 'staging-any']
+    vcs: 'staging'
+    arch: 'staging-x86_64'
+    any: 'staging-any'
   - name: 'gremlins'
-    arch: ['testing-x86_64', 'testing-any']
+    vcs: 'testing'
+    arch: 'testing-x86_64'
+    any: 'testing-any'
   - name: 'system'
-    arch: ['core-x86_64', 'core-any']
+    vcs: 'core'
+    arch: 'core-x86_64'
+    any: 'core-any'
   - name: 'world'
-    arch: ['extra-x86_64', 'extra-any']
+    vcs: 'extra'
+    arch: 'extra-x86_64'
+    any: 'extra-any'
   - name: 'galaxy-goblins'
-    arch: ['community-staging-x86_64', 'community-staging-any']
+    vcs: 'community-staging'
+    arch: 'community-staging-x86_64'
+    any: 'community-staging-any'
   - name: 'galaxy-gremlins'
-    arch: ['community-testing-x86_64', 'community-testing-any']
+    vcs: 'community-testing'
+    arch: 'community-testing-x86_64'
+    any: 'community-testing-any'
   - name: 'galaxy'
-    arch: ['community-x86_64', 'community-any']
+    vcs: 'community'
+    arch: 'community-x86_64'
+    any: 'community-any'
   - name: 'lib32-goblins'
-    arch: ['multilib-staging-x86_64']
+    vcs: 'multilib-staging'
+    arch: 'multilib-staging-x86_64'
   - name: 'lib32-gremlins'
-    arch: ['multilib-testing-x86_64']
+    vcs: 'multilib-testing'
+    arch: 'multilib-testing-x86_64'
   - name: 'lib32'
-    arch: ['multilib-x86_64']
+    vcs: 'multilib'
+    arch: 'multilib-x86_64'
   - name: 'kde-wobble'
-    arch: ['kde-unstable-x86_64', 'kde-unstable-any']
+    vcs: 'kde-unstable'
+    arch: 'kde-unstable-x86_64'
+    any: 'kde-unstable-any'
   - name: 'gnome-wobble'
-    arch: ['gnome-unstable-x86_64', 'gnome-unstable-any']
+    vcs: 'gnome-unstable'
+    arch: 'gnome-unstable-x86_64'
+    any: 'gnome-unstable-any'
 
 tools:
-    buildCmd: 'buildpkg -C'
-    repoAddCmd: 'deploypkg -a -l'
-    repoRemoveCmd: 'deploypkg -r -l'
-    signCmd: 'signpkg'
-    yamlCmd: 'pkg2yaml -d'
-    repoPathGit: 'trunk'
+    cmdBuild: 'buildpkg -C'
+    cmdRepoAdd: 'deploypkg -a -l'
+    cmdRepoRemove: 'deploypkg -r -l'
+    cmdSign: 'signpkg'
+    cmdYaml: 'pkg2yaml -d'
+
+src:
+    repoPath: 'trunk'
+    repoName: 'trunk'
     repoAddName: 'default'
     repoRemoveName: 'default'
-    repoName: 'trunk'
 
 actions:
     isAdd: false

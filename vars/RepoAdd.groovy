@@ -1,8 +1,9 @@
 #!/usr/bin/env groovy
 
 def call(def pkg) {
-    pkg.artixConfig.tools.repoAddCmd += " -d ${pkg.artixConfig.tools.repoAddName}"
-    catchError(message: "Errors occurred.", buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-        sh "${pkg.artixConfig.tools.repoAddCmd} ${pkg.pkgInfo.pkgfile.join(' ')}"
+    pkg.config.tools.cmdRepoAdd += " -d ${pkg.config.src.repoAddName}"
+    catchError(message: "Errors occurred.", buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
+        String args = pkg.info.files.join(' ')
+        sh "${pkg.config.tools.cmdRepoAdd} ${args}"
     }
 }

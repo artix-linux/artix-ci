@@ -1,19 +1,19 @@
 #!/usr/bin/env groovy
 
 def call(def pkg){
-    pkg.artixConfig.tools.buildCmd += " -d ${pkg.artixConfig.tools.repoAddName}"
+    pkg.config.tools.cmdBuild += " -d ${pkg.config.src.repoAddName}"
     Boolean isLibBump = false
-    if ( pkg.artixConfig.tools.repoName == 'goblins' ) {
+    if ( pkg.config.src.repoName == 'goblins' ) {
         isLibBump = input message: "Is this the first of a major staging rebuild?",
         parameters: [booleanParam(name: 'isLibBump', defaultValue: false, description: 'Select')]
     }
     echo "isLibBump: " + isLibBump
     if ( isLibBump ) {
-        pkg.artixConfig.tools.buildCmd += " -m"
+        pkg.config.tools.cmdBuild += " -m"
     }
-    dir(pkg.artixConfig.tools.repoPathGit) {
-        catchError(message: "FAILURE", buildResult: 'FAILURE', stageResult: 'FAILURE') {
-            sh "${pkg.artixConfig.tools.buildCmd}"
+    dir(pkg.config.src.repoPath) {
+        catchError(message: "Failed to build source", buildResult: 'FAILURE', stageResult: 'FAILURE') {
+            sh "${pkg.config.tools.cmdBuild}"
         }
     }
 }
