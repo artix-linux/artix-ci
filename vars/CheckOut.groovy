@@ -2,9 +2,10 @@
 
 def call(def pkg){
     catchError(message: "Failed to prepare source", buildResult: 'FAILURE', stageResult: 'FAILURE') {
-        checkout(scm)
-        pkg.initialize()
+        String commit = checkout(scm).GIT_COMMIT
+        pkg.initialize(commit)
         currentBuild.displayName = pkg.config.src.repoName
         currentBuild.description = pkg.info.pkgbase.name + '-' + pkg.info.version
+        echo "isNextLayout: " + pkg.config.src.isNextLayout
     }
 }

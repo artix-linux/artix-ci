@@ -3,16 +3,18 @@
 def call(def pkg) {
     String msg = 'Fixed'
 
-    String msgSubject = "${msg}: ${pkg.info.pkgbase.name}"
-    String subject = "[${pkg.config.src.repoAddName}] ${msgSubject}"
-    String bodyAction = "<p>Build: ${pkg.config.src.repoPath}</p>"
-    String bodyInfo = "<p>Packages: </p><p>${pkg.info.files.join('\n')}</p>"
-    String bodyRepo = "<p><strong>${msg}</strong></p>"
-    String bodyAuthor = "<p>authorName: ${pkg.author.name}</p><p>authorEmail: ${pkg.author.email}</p>"
-    String bodyUrl = "<p><a href=${BUILD_URL}>${BUILD_URL}</a></p>"
+    String subject = "[${pkg.config.src.repoAddName}] ${msg}: ${pkg.info.pkgbase.name}"
     String sendTo = 'artix-build-fixes@artixlinux.org'
 
-    String body = "${bodyRepo}${bodyAction}${bodyInfo}${bodyAuthor}${bodyUrl}"
+    String body = """
+        <p><strong>${msg}</strong></p>
+        <p>Build: ${pkg.config.src.repoPath}</p>
+        <p>Packages:</p>
+        <p>${pkg.info.files.join('\n')}</p>
+        <p>author: ${pkg.config.author.name}</p>
+        <p>email: ${pkg.config.author.email}</p>
+        <p><a href=${BUILD_URL}>${BUILD_URL}</a></p>
+        """
 
-    emailext (body: body, subject: subject, to: sendTo, attachLog: false)
+    emailext (mimeType: 'text/html', body: body, subject: subject, to: sendTo, attachLog: false)
 }

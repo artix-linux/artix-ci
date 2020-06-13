@@ -13,11 +13,7 @@ class RepoPackage implements Serializable {
 
     private Map info = [:]
 
-    private Map author = [:]
-
     private List<String> repoListGit = []
-
-    private Boolean isNextLayout = false
 
     def getConfig() {
         config
@@ -27,19 +23,15 @@ class RepoPackage implements Serializable {
         info
     }
 
-    def getAuthor() {
-        author
-    }
-
     private String findRepo(String name) {
-        if ( isNextLayout ) {
+        if ( config.src.isNextLayout ) {
             return config.repos.each { it }.find { it.vcs == name }.name
         } else {
             return config.repos.each { it }.find { it.arch == name || it.any == name }.name
         }
     }
 
-    private void repoPkgOp() {
+    private void configureOperation() {
 
         String srcRepo = repoListGit[0].path.tokenize('/')[1]
 
@@ -59,7 +51,7 @@ class RepoPackage implements Serializable {
 
     }
 
-    private void repoPkgMove(){
+    private void configureOperations(){
 
         String srcRepo = repoListGit[0].path.tokenize('/')[1]
         String destRepo = repoListGit[1].path.tokenize('/')[1]
@@ -95,68 +87,76 @@ class RepoPackage implements Serializable {
         config.src.repoName = config.src.repoAddName
     }
 
-    private void loadResources(){
-        def conf = steps.libraryResource('org/artixlinux/artixConfig.yaml')
+    private void loadConfig(){
+        def conf = steps.libraryResource('org/artixlinux/config.yaml')
         config = steps.readYaml(text: conf)
     }
 
-    private void loadChangeSet() {
-        String gitCmd = 'git rev-parse @'
-        String commit = steps.sh(returnStdout: true, script: gitCmd).trim()
+    private void loadChangeSet(String commit) {
+        String cmdGit = "git show -s --format='%an' ${commit}"
+        config.author.name = steps.sh(returnStdout: true, script: cmdGit)
 
-        gitCmd = "git show -s --format='%an' ${commit}"
-        String authorName = steps.sh(returnStdout: true, script: gitCmd)
+        cmdGit = "git show -s --format='%ae' ${commit}"
+        config.author.email = steps.sh(returnStdout: true, script: cmdGit)
 
-        String authorGpg = "GPG_" + authorName.toUpperCase()
+        config.author.gpgkey = "GPG_" + config.author.name.toUpperCase()
 
-        gitCmd = "git show -s --format='%ae' ${commit}"
-        String authorEmail = steps.sh(returnStdout: true, script: gitCmd)
-
-        author = [name: authorName, email: authorEmail, gpgkey: authorGpg]
-
-        gitCmd = "git show --pretty=format: --name-status ${commit}"
-        List<String> changeSet = steps.sh(returnStdout: true, script: gitCmd).tokenize('\n')
+        cmdGit = "git show --pretty=format: --name-status ${commit}"
+        List<String> changeSet = steps.sh(returnStdout: true, script: cmdGit).tokenize('\n')
 
         for ( int i = 0; i < changeSet.size(); i++ ) {
+
             List<String> entry = changeSet[i].split()
+
             String fileStatus = entry[0]
+
             for ( int j = 1; j < entry.size(); j++ ) {
+
                 if ( entry[j].startsWith(config.arch + "/") && entry[j].endsWith(config.pkgbuild) ) {
-                    isNextLayout = true
+                    config.src.isNextLayout = true
                     Map dataSet = [status: fileStatus, path: entry[j].minus(config.pkgbuild)]
                     repoListGit.add(dataSet)
                 } else if ( entry[j].startsWith('repos/') && entry[j].endsWith(config.pkgbuild) ) {
                     Map dataSet = [status: fileStatus, path: entry[j].minus(config.pkgbuild)]
                     repoListGit.add(dataSet)
                 }
+
             }
         }
     }
 
-    private void loadPkgYaml() {
-        String pkgYaml = steps.sh(returnStdout: true, script: "${config.tools.cmdYaml} ${config.src.repoPath}")
-        info = steps.readYaml(text: pkgYaml)
+    private void configureTools() {
+        config.tools.cmdYaml += " ${config.src.repoPath}"
+        String srcInfo = steps.sh(returnStdout: true, script: "${config.tools.cmdYaml}")
+        info = steps.readYaml(text: srcInfo)
+
+        String fileArgs = info.files.join(' ')
+        String pkgBaseArgs = info.packages.collect { it.pkgname }.join(' ')
+
+        config.tools.cmdBuild += " -d ${config.src.repoAddName}"
+        config.tools.cmdSign += " ${fileArgs}"
+        config.tools.cmdRepoAdd += " -d ${config.src.repoAddName} ${fileArgs}"
+        config.tools.cmdRepoRemove += " -d ${config.src.repoRemoveName} ${pkgBaseArgs}"
     }
 
-    void initialize() {
+    void initialize(String commit) {
 
-        loadResources()
+        loadConfig()
 
-        loadChangeSet()
+        loadChangeSet(commit)
 
         byte repoCount = repoListGit.size()
 
         if ( repoCount > 0 ) {
 
             if ( repoCount == 1 ) {
-
-                repoPkgOp()
-
+                configureOperation()
             } else if ( repoCount == 2 ) {
-
-                repoPkgMove()
+                configureOperations()
             }
+
         }
-        loadPkgYaml()
+        configureTools()
     }
+
 }

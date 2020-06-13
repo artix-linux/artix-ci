@@ -1,10 +1,9 @@
 #!/usr/bin/env groovy
 
 def call(def pkg){
-    pkg.config.tools.cmdBuild += " -d ${pkg.config.src.repoAddName}"
     Boolean isLibBump = false
     if ( pkg.config.src.repoName == 'goblins' ) {
-        isLibBump = input message: "Is this the first of a major staging rebuild?",
+        isLibBump = input message: "Is this a *.so version bump to cause rebuilds?",
         parameters: [booleanParam(name: 'isLibBump', defaultValue: false, description: 'Select')]
     }
     echo "isLibBump: " + isLibBump

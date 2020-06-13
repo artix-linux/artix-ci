@@ -63,6 +63,12 @@ src:
     repoName: 'trunk'
     repoAddName: 'default'
     repoRemoveName: 'default'
+    isNextLayout: false
+
+author:
+    name: ''
+    email: ''
+    gpgkey: ''
 
 actions:
     isAdd: false
