@@ -6,6 +6,5 @@ def call(def pkg){
         pkg.initialize(commit)
         currentBuild.displayName = pkg.config.src.repoName
         currentBuild.description = pkg.info.pkgbase.name + '-' + pkg.info.version
-        echo "isNextLayout: " + pkg.config.src.isNextLayout
     }
 }

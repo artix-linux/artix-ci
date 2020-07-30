@@ -24,11 +24,7 @@ class RepoPackage implements Serializable {
     }
 
     private String findRepo(String name) {
-        if ( config.src.isNextLayout ) {
-            return config.repos.each { it }.find { it.vcs == name }.name
-        } else {
-            return config.repos.each { it }.find { it.arch == name || it.any == name }.name
-        }
+        return config.repos.each { it }.find { it.vcs == name }.name
     }
 
     private void configureOperation() {
@@ -114,9 +110,6 @@ class RepoPackage implements Serializable {
 
                 if ( entry[j].startsWith(config.arch) && entry[j].endsWith(config.pkgbuild) ) {
                     config.src.isNextLayout = true
-                    Map dataSet = [status: fileStatus, path: entry[j].minus(config.pkgbuild)]
-                    repoListGit.add(dataSet)
-                } else if ( entry[j].startsWith('repos/') && entry[j].endsWith(config.pkgbuild) ) {
                     Map dataSet = [status: fileStatus, path: entry[j].minus(config.pkgbuild)]
                     repoListGit.add(dataSet)
                 }
