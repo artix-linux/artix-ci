@@ -109,7 +109,6 @@ class RepoPackage implements Serializable {
             for ( int j = 1; j < entry.size(); j++ ) {
 
                 if ( entry[j].startsWith(config.arch) && entry[j].endsWith(config.pkgbuild) ) {
-                    config.src.isNextLayout = true
                     Map dataSet = [status: fileStatus, path: entry[j].minus(config.pkgbuild)]
                     repoListGit.add(dataSet)
                 }
