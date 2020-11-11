@@ -15,11 +15,11 @@ class RepoPackage implements Serializable {
 
     private List<String> repoListGit = []
 
-    def getConfig() {
+    Map getConfig() {
         config
     }
 
-    def getInfo() {
+    Map getInfo() {
         info
     }
 
