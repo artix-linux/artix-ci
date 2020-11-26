@@ -4,7 +4,6 @@ def call(def pkg) {
     String msg = 'repo-add'
 
     String subject = "[${pkg.config.src.repoAddName}] ${msg}: ${pkg.info.pkgbase.name}"
-    String sendTo = 'artix-builds@artixlinux.org'
 
     String body = """
         <p><strong>${msg}</strong></p>
@@ -16,5 +15,11 @@ def call(def pkg) {
         <p><a href=${BUILD_URL}>${BUILD_URL}</a></p>
         """
 
-    emailext (mimeType: 'text/html', body: body, subject: subject, to: sendTo, attachLog: false)
+    emailext (
+        mimeType: 'text/html',
+        body: body,
+        subject: subject,
+        to: pkg.config.notify.builds,
+        attachLog: false
+    )
 }

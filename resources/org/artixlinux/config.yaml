@@ -29,6 +29,8 @@ repos:
     vcs: 'kde-unstable'
   - name: 'gnome-wobble'
     vcs: 'gnome-unstable'
+  - name: 'goblins'
+    vcs: 'rebuild'
 
 tools:
     cmdBuild: 'buildpkg -C'
@@ -52,3 +54,8 @@ actions:
     isAdd: false
     isRemove: false
     isBuild: false
+
+notify:
+    builds: 'artix-builds@artixlinux.org'
+    fails: 'artix-build-failures@artixlinux.org'
+    fixes: 'artix-build-fixes@artixlinux.org'

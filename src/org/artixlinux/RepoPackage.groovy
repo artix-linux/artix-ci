@@ -31,6 +31,10 @@ class RepoPackage implements Serializable {
 
         String srcRepo = repoListGit[0].path.tokenize('/')[1]
 
+        if ( srcRepo == 'rebuild' ) {
+            config.tools.cmdBuild += " -m"
+        }
+
         if ( repoListGit[0].status == 'A' || repoListGit[0].status == 'M' ) {
             config.actions.isBuild = true
             config.src.repoAddName = findRepo(srcRepo)
@@ -44,7 +48,6 @@ class RepoPackage implements Serializable {
         if ( steps.fileExists(repoListGit[0].path + config.pkgbuild) ) {
             config.src.repoPath = repoListGit[0].path
         }
-
     }
 
     private void configureOperations(){
