@@ -126,12 +126,11 @@ class RepoPackage implements Serializable {
         info = steps.readYaml(text: srcInfo)
 
         String fileArgs = info.files.join(' ')
-        String pkgBaseArgs = info.packages.collect { it.pkgname }.join(' ')
 
         config.tools.cmdBuild += " -d ${config.src.repoAddName}"
         config.tools.cmdSign += " ${fileArgs}"
         config.tools.cmdRepoAdd += " -d ${config.src.repoAddName} ${fileArgs}"
-        config.tools.cmdRepoRemove += " -d ${config.src.repoRemoveName} ${pkgBaseArgs}"
+        config.tools.cmdRepoRemove += " -d ${config.src.repoRemoveName} ${fileArgs}"
     }
 
     void initialize(String commit) {
