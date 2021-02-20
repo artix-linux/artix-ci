@@ -58,4 +58,5 @@ actions:
 notify:
     builds: 'artix-builds@artixlinux.org'
     fails: 'artix-build-failures@artixlinux.org'
-    fixes: 'artix-build-fixes@artixlinux.org'
+    repos: 'artix-repos@artixlinux.org'
+    mime: 'text/html'

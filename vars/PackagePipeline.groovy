@@ -25,9 +25,8 @@ def call(def pkg) {
                     BuildPkg(pkg)
                 }
                 post {
-                    success { PostBuild(pkg) }
-                    failure { NotifyFail(pkg) }
-                    fixed { NotifyFixed(pkg) }
+                    success { NotifyBuildSuccess(pkg) }
+                    failure { NotifyBuildFailure(pkg) }
                 }
             }
             stage('Add') {
