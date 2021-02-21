@@ -37,7 +37,7 @@ def call(def pkg) {
                     RepoAdd(pkg)
                 }
                 post {
-                    always { pkg.sendRepoMail('repo-add') }
+                    always { NotifyRepoAdd(pkg) }
                 }
             }
             stage('Remove') {
@@ -48,7 +48,7 @@ def call(def pkg) {
                     RepoRemove(pkg)
                 }
                 post {
-                    always { pkg.sendRepoMail('repo-remove') }
+                    always { NotifyRepoRemove(pkg) }
                 }
             }
         }
