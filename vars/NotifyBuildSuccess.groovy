@@ -4,7 +4,8 @@ def call(def pkg) {
     sh "${pkg.config.tools.cmdSign}"
     pkg.config.actions.isAdd = true
 
-    pkg.sendBuildMail('Success', pkg.config.notify.builds, BUILD_URL)
+    // maybe only send namcap & check logs?
+//     pkg.sendBuildMail('Success', pkg.config.notify.builds, BUILD_URL)
 
     archiveArtifacts(
         allowEmptyArchive: true,

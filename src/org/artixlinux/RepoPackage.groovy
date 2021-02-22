@@ -156,7 +156,7 @@ class RepoPackage implements Serializable {
             subject: getBuildMailSubject(msg),
             to: sendto,
             attachLog: false,
-            attachmentsPattern: "${config.arch}**/*.log",
+            attachmentsPattern: "*.log",
             compressLog: true
         )
     }
