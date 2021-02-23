@@ -133,59 +133,6 @@ class RepoPackage implements Serializable {
         config.tools.cmdRepoRemove += " -d ${config.src.repoRemoveName} ${fileArgs}"
     }
 
-    private String getBuildMailSubject(String msg) {
-        return "[${config.src.repoAddName}] ${msg}: ${info.pkgbase.name}"
-    }
-
-    private String getBuildMailBody(String msg, String url) {
-        return """
-        <p><strong>${msg}</strong></p>
-        <p>Build: ${config.src.repoPath}</p>
-        <p>Name:</p>
-        <p>${info.pkgbase.name}</p>
-        <p>author: ${config.author.name}</p>
-        <p>email: ${config.author.email}</p>
-        <p><a href=${url}>${url}</a></p>
-        """
-    }
-
-    void sendBuildMail(String msg, String sendto, String url) {
-        steps.emailext (
-            mimeType: config.notify.mime,
-            body: getBuildMailBody(msg, url),
-            subject: getBuildMailSubject(msg),
-            to: sendto,
-            attachLog: false,
-            attachmentsPattern: "*.log",
-            compressLog: true
-        )
-    }
-
-    private String getRepoMailSubject(String msg, String action) {
-        return "[${action}] ${msg}: ${info.pkgbase.name}"
-    }
-
-    private String getRepoMailBody(String msg, String repo) {
-        return """
-        <p><strong>${msg}</strong></p>
-        <p>Repo: ${repo}</p>
-        <p>Packages:</p>
-        <p>${info.files.join('\n')}</p>
-        <p>author: ${config.author.name}</p>
-        <p>email: ${config.author.email}</p>
-        """
-    }
-
-    void sendRepoMail(String msg) {
-        steps.emailext (
-            mimeType: config.notify.mime,
-            body: getRepoMailBody(msg, config.src.repoAddName),
-            subject: getRepoMailSubject(msg, config.src.repoAddName),
-            to: config.notify.repos,
-            attachLog: false
-        )
-    }
-
     void initialize(String commit) {
 
         loadConfig()
