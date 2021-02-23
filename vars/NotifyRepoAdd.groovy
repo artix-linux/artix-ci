@@ -3,6 +3,7 @@
 def call(def pkg) {
     String msg = 'repo-add'
     String subject = "[${msg}] ${pkg.config.src.repoAddName}: ${pkg.info.pkgbase.name}"
+
     String body = """
         <p><strong>${msg}</strong></p>
         <p>Repo: ${pkg.config.src.repoAddName}</p>

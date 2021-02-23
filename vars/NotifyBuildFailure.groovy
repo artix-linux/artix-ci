@@ -10,14 +10,14 @@ def call(def pkg) {
     String subject = "[${pkg.config.src.repoAddName}] ${msg}: ${pkg.info.pkgbase.name}"
 
     String body = """
-    <p><strong>${msg}</strong></p>
-    <p>Build: ${pkg.config.src.repoPath}</p>
-    <p>Name:</p>
-    <p>${pkg.info.pkgbase.name}</p>
-    <p>author: ${pkg.config.author.name}</p>
-    <p>email: ${pkg.config.author.email}</p>
-    <p><a href=${BUILD_URL}>${BUILD_URL}</a></p>
-    """
+        <p><strong>${msg}</strong></p>
+        <p>Build: ${pkg.config.src.repoPath}</p>
+        <p>Name:</p>
+        <p>${pkg.info.pkgbase.name}</p>
+        <p>author: ${pkg.config.author.name}</p>
+        <p>email: ${pkg.config.author.email}</p>
+        <p><a href=${BUILD_URL}>${BUILD_URL}</a></p>
+        """
 
     emailext (
         mimeType: pkg.config.notify.mime,
@@ -25,7 +25,7 @@ def call(def pkg) {
         body: body,
         to: pkg.config.notify.fails,
         attachLog: false,
-        attachmentsPattern: "${pkg.config.arch}**/*.log",
+        attachmentsPattern: "${pkg.config.src.repoPath}/*.log",
         compressLog: true
     )
 }
