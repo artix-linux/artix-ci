@@ -28,7 +28,7 @@ def call(def pkg) {
         body: body,
         to: pkg.config.notify.builds,
         attachLog: false,
-        attachmentsPattern: "${pkg.config.src.repoPath}/*namcap.log",
+        attachmentsPattern: "*namcap.log",
         compressLog: true
     )
 }

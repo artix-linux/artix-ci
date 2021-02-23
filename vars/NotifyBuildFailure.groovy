@@ -25,7 +25,7 @@ def call(def pkg) {
         body: body,
         to: pkg.config.notify.fails,
         attachLog: false,
-        attachmentsPattern: "${pkg.config.src.repoPath}/*.log",
+        attachmentsPattern: "*.log",
         compressLog: true
     )
 }
