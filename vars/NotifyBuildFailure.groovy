@@ -1,31 +1,30 @@
 #!/usr/bin/env groovy
 
 def call(def pkg) {
-    archiveArtifacts(
-        allowEmptyArchive: true,
-        artifacts: "${pkg.config.arch}**/*.log"
-    )
+    String path = pkg.config.src.repoPath
+    String pkgbase = pkg.info.pkgbase.name
 
-    String msg = 'Failure'
-    String subject = "[${pkg.config.src.repoAddName}] ${msg}: ${pkg.info.pkgbase.name}"
+    String subject = "[${pkg.config.src.repoAddName}] Failure: ${pkgbase}"
 
     String body = """
-        <p><strong>${msg}</strong></p>
-        <p>Build: ${pkg.config.src.repoPath}</p>
-        <p>Name:</p>
-        <p>${pkg.info.pkgbase.name}</p>
+        <p>Build: ${path}</p>
+        <p>Name: ${pkgbase}</p>
         <p>author: ${pkg.config.author.name}</p>
         <p>email: ${pkg.config.author.email}</p>
         <p><a href=${BUILD_URL}>${BUILD_URL}</a></p>
         """
 
     emailext (
+        attachmentsPattern: "**/*.log",
         mimeType: pkg.config.notify.mime,
         subject: subject,
         body: body,
         to: pkg.config.notify.fails,
-        attachLog: false,
-        attachmentsPattern: "*.log",
-        compressLog: true
+        attachLog: true
+    )
+
+    archiveArtifacts(
+        allowEmptyArchive: true,
+        artifacts: "${path}/*.log"
     )
 }
