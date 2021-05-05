@@ -2,7 +2,7 @@
 
 def call(def pkg) {
     String path = pkg.config.src.repoPath
-    String pkgbase = pkg.info.pkgbase.name
+    String pkgbase = "${pkg.info.pkgbase.name}-${pkg.info.version}"
 
     String subject = "[${pkg.config.src.repoAddName}] Failure: ${pkgbase}"
 

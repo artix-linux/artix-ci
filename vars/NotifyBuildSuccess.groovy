@@ -5,7 +5,7 @@ def call(def pkg) {
     pkg.config.actions.isAdd = true
 
     String path = pkg.config.src.repoPath
-    String pkgbase = pkg.info.pkgbase.name
+    String pkgbase = "${pkg.info.pkgbase.name}-${pkg.info.version}"
 
     String subject = "[${pkg.config.src.repoAddName}] Success: ${pkgbase}"
 
