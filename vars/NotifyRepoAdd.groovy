@@ -3,7 +3,7 @@
 def call(def pkg) {
     String repo = pkg.config.src.repoAddName
 
-    String subject = "[${repo}] add: ${pkg.info.pkgbase.name}"
+    String subject = "[${repo}] add: ${pkg.info.pkgbase.name}-${pkg.info.version}"
 
     String body = """
         <p>Repo: ${repo}</p>

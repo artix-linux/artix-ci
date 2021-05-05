@@ -3,7 +3,7 @@
 def call(def pkg) {
     String repo = pkg.config.src.repoRemoveName
 
-    String subject = "[${repo}] remove: ${pkg.info.pkgbase.name}"
+    String subject = "[${repo}] remove: ${pkg.info.pkgbase.name}-${pkg.info.version}"
 
     String body = """
         <p>Repo: ${repo}</p>
