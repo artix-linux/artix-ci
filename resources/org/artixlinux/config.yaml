@@ -33,7 +33,7 @@ repos:
     vcs: 'rebuild'
 
 tools:
-    cmdBuild: 'buildpkg -C'
+    cmdBuild: 'buildpkg -CN'
     cmdRepoAdd: 'deploypkg -a -l'
     cmdRepoRemove: 'deploypkg -r -l'
     cmdSign: 'signpkg'
