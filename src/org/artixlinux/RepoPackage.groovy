@@ -121,16 +121,18 @@ class RepoPackage implements Serializable {
     }
 
     private void configureTools() {
-        config.tools.cmdYaml += " ${config.src.repoPath}"
-        String srcInfo = steps.sh(returnStdout: true, script: "${config.tools.cmdYaml}")
-        info = steps.readYaml(text: srcInfo)
+        if ( steps.fileExists(config.src.repoPath + config.pkgbuild) ) {
+            config.tools.cmdYaml += " ${config.src.repoPath}"
+            String srcInfo = steps.sh(returnStdout: true, script: "${config.tools.cmdYaml}")
+            info = steps.readYaml(text: srcInfo)
 
-        String fileArgs = info.files.join(' ')
+            String fileArgs = info.files.join(' ')
 
-        config.tools.cmdBuild += " -d ${config.src.repoAddName}"
-        config.tools.cmdSign += " ${fileArgs}"
-        config.tools.cmdRepoAdd += " -d ${config.src.repoAddName} ${fileArgs}"
-        config.tools.cmdRepoRemove += " -d ${config.src.repoRemoveName} ${fileArgs}"
+            config.tools.cmdBuild += " -d ${config.src.repoAddName}"
+            config.tools.cmdSign += " ${fileArgs}"
+            config.tools.cmdRepoAdd += " -d ${config.src.repoAddName} ${fileArgs}"
+            config.tools.cmdRepoRemove += " -d ${config.src.repoRemoveName} ${fileArgs}"
+        }
     }
 
     void initialize(String commit) {
